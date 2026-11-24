@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Stok Harian Kinmart Mandiri</title>
+    <script id="hatch-space-target">
+    (() => {
+      const params = new URLSearchParams(location.hash.slice(1));
+      const root = document.documentElement;
+      if (params.get("hatch_target") === "tv") root.dataset.hatchTarget = "tv";
+      const widget = params.get("hatch_view") === "widget";
+      root.dataset.hatchView = widget ? "widget" : "app";
+      if (widget) {
+        root.dataset.hatchWidget = params.get("hatch_widget") || "default";
+        root.dataset.hatchInstance = params.get("hatch_instance") || "";
+        const sizes = ["small", "medium", "large", "watch", "watch_round"];
+        root.dataset.hatchSize = sizes.includes(params.get("hatch_size")) ? params.get("hatch_size") : "small";
+        const style = document.createElement("style");
+        style.textContent = 'html[data-hatch-view="widget"], html[data-hatch-view="widget"] body { background: transparent; }';
+        document.head.prepend(style);
+      }
+    })();
+    </script>
+    <style>
+      :root {
+        --green: #009444;
+        --green-dark: #00702f;
+        --lime: #8dc63f;
+        --red: #d92d20;
+        --red-dark: #b42318;
+        --amber: #dc7a06;
+        --amber-dark: #b45f04;
+        --bg: #eef3ea;
+        --surface: #ffffff;
+        --surface-2: #f4f8f1;
+        --ink: #17251a;
+        --ink-soft: #4c5d4f;
+        --line: #d8e2d2;
+        --chip: #e6efe1;
+        --shadow: 0 1px 3px rgba(23, 60, 30, .10);
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #10150f;
+          --surface: #1a211a;
+          --surface-2: #222b21;
+          --ink: #eef5ec;
+          --ink-soft: #a9bda6;
+          --line: #33402f;
+          --chip: #26331f;
+          --shadow: 0 1px 3px rgba(0,0,0,.4);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.45;
+      }
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2.25rem; }
+      button { font: inherit; cursor: pointer; }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 0 14px 48px; }
+
+      /* ---------- Header ---------- */
+      .topbar {
+        position: sticky; top: 0; z-index: 20;
+        background: var(--bg);
+        padding: 12px 0 10px;
+      }
+      .brand { display: flex; align-items: center; gap: 12px; }
+      .brand svg { flex: none; border-radius: 10px; box-shadow: var(--shadow); }
+      .brand h1 { font-size: 1.28rem; margin: 0; letter-spacing: .01em; line-height: 1.15; }
+      .brand .date { color: var(--ink-soft); font-size: .92rem; margin-top: 2px; }
+      .brand .date strong { color: var(--ink); }
+
+      .counts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
+      .count {
+        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 9px 10px; text-align: center; box-shadow: var(--shadow);
+      }
+      .count b { display: block; font-size: 1.55rem; line-height: 1.1; }
+      .count span { font-size: .82rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+      .count.ready b, .count.ready span { color: var(--green-dark); }
+      .count.kosong b, .count.kosong span { color: var(--red); }
+      .count.restok b, .count.restok span { color: var(--amber); }
+      @media (prefers-color-scheme: dark) {
+        .count.ready b, .count.ready span { color: #4cc97e; }
+        .count.kosong b, .count.kosong span { color: #ff8a7a; }
+        .count.restok b, .count.restok span { color: #ffb35c; }
+      }
+
+      .actions { display: flex; gap: 8px; margin-top: 10px; }
+      .btn {
+        border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+        border-radius: 10px; padding: 8px 14px; font-weight: 600; min-height: 40px;
+        display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      }
+      .btn:disabled { opacity: .45; cursor: default; }
+      .btn.undo { flex: 1; }
+      .btn.reset { color: var(--red-dark); border-color: var(--line); }
+      .btn.reset.armed { background: var(--red); border-color: var(--red); color: #fff; }
+      @media (prefers-color-scheme: dark) { .btn.reset { color: #ff8a7a; } .btn.reset.armed { color:#fff; } }
+      .btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+      .btn.primary:disabled { background: var(--chip); border-color: var(--line); color: var(--ink-soft); }
+      .btn.wa { background: #1faa55; border-color: #1faa55; color: #fff; flex: 1; }
+      .btn.ghost { flex: 0 0 auto; }
+
+      /* ---------- Tabs ---------- */
+      .tabs { display: flex; gap: 6px; margin: 14px 0 12px; flex-wrap: wrap; }
+      .tab {
+        flex: 1 1 auto; border: 1px solid var(--line); background: var(--surface);
+        border-radius: 999px; padding: 9px 10px; font-weight: 700; font-size: .95rem;
+        color: var(--ink-soft); min-height: 42px; white-space: nowrap;
+      }
+      .tab.active { background: var(--green); border-color: var(--green); color: #fff; }
+      .panel { display: none; }
+      .panel.active { display: block; }
+
+      /* ---------- Daftar ---------- */
+      .searchrow { display: flex; gap: 8px; }
+      .searchrow input[type="search"] {
+        flex: 1; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+        font: inherit; background: var(--surface); color: var(--ink); min-height: 44px; width: 100%;
+      }
+      .filters { display: flex; gap: 6px; margin: 10px 0 12px; flex-wrap: wrap; }
+      .fchip {
+        border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+        border-radius: 999px; padding: 7px 14px; font-weight: 600; min-height: 38px;
+      }
+      .fchip.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+      .item {
+        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 10px 12px; margin-bottom: 8px; box-shadow: var(--shadow);
+      }
+      .item-head { display: flex; align-items: center; gap: 8px; }
+      .item-name { font-weight: 600; font-size: 1.02rem; flex: 1; min-width: 0; }
+      .pill {
+        flex: none; font-size: .74rem; font-weight: 800; letter-spacing: .05em;
+        padding: 4px 9px; border-radius: 999px; text-transform: uppercase;
+      }
+      .pill.R { background: #dff3e4; color: var(--green-dark); }
+      .pill.K { background: #fde3e0; color: var(--red-dark); }
+      .pill.S { background: #fdeed3; color: var(--amber-dark); }
+      @media (prefers-color-scheme: dark) {
+        .pill.R { background: #173d24; color: #6fe39a; }
+        .pill.K { background: #47201c; color: #ff9d8f; }
+        .pill.S { background: #463311; color: #ffc06e; }
+      }
+      .seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 9px; }
+      .seg button {
+        border-radius: 9px; border: 1.5px solid var(--line); background: var(--surface-2);
+        font-weight: 800; font-size: .86rem; letter-spacing: .03em; padding: 9px 4px; min-height: 42px;
+        color: var(--ink-soft);
+      }
+      .seg button.on-R { background: var(--green); border-color: var(--green); color: #fff; }
+      .seg button.on-K { background: var(--red); border-color: var(--red); color: #fff; }
+      .seg button.on-S { background: var(--amber); border-color: var(--amber); color: #fff; }
+      .empty-note { text-align: center; color: var(--ink-soft); padding: 26px 10px; }
+
+      /* ---------- Input hari ini ---------- */
+      .card {
+        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow);
+      }
+      .card h2 { font-size: 1.05rem; margin: 0 0 4px; }
+      .card p.hint { margin: 0 0 10px; color: var(--ink-soft); font-size: .92rem; }
+      .pick-list { max-height: 300px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+      .pick {
+        display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 44px;
+        border-bottom: 1px solid var(--line); cursor: pointer; font-weight: 550;
+      }
+      .pick:last-child { border-bottom: 0; }
+      .pick input { width: 22px; height: 22px; flex: none; accent-color: var(--green); }
+      .pick .cur { margin-left: auto; font-size: .78rem; color: var(--ink-soft); flex: none; }
+      .applybar { display: flex; gap: 8px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+      .applybar .selinfo { color: var(--ink-soft); font-size: .92rem; flex: 1; min-width: 140px; }
+
+      /* ---------- Kirim WA ---------- */
+      .wa-input { display: flex; gap: 8px; flex-wrap: wrap; }
+      .wa-input input {
+        flex: 1; min-width: 180px; border: 1px solid var(--line); border-radius: 10px;
+        padding: 10px 12px; font: inherit; background: var(--surface); color: var(--ink); min-height: 44px;
+      }
+      .msg { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); }
+      .msg-head {
+        display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+        background: var(--surface-2); border-bottom: 1px solid var(--line);
+      }
+      .msg-head b { flex: 1; }
+      .msg-head .n { color: var(--ink-soft); font-size: .88rem; font-weight: 600; }
+      .sent-tag { display: none; font-size: .78rem; font-weight: 800; color: var(--green-dark); letter-spacing: .03em; }
+      .msg.sent .sent-tag { display: inline; }
+      .msg pre {
+        margin: 0; padding: 12px; font: inherit; font-size: .97rem; white-space: pre-wrap;
+        word-break: break-word; max-height: 260px; overflow: auto;
+      }
+      .msg-foot { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
+      .steps { margin: 0 0 12px; padding-left: 20px; color: var(--ink-soft); font-size: .95rem; }
+      .steps li { margin-bottom: 3px; }
+
+      /* ---------- Cadangan ---------- */
+      .backup-btns { display: grid; gap: 8px; }
+      .backup-btns .btn { width: 100%; min-height: 46px; }
+      .howto { margin: 0; padding-left: 20px; font-size: .95rem; }
+      .howto li { margin-bottom: 6px; }
+
+      .toast {
+        position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(20px);
+        background: var(--ink); color: var(--bg); padding: 11px 18px; border-radius: 999px;
+        font-weight: 600; font-size: .95rem; opacity: 0; pointer-events: none;
+        transition: opacity .2s, transform .2s; z-index: 50; max-width: 88vw; text-align: center;
+        box-shadow: 0 6px 20px rgba(0,0,0,.25);
+      }
+      .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+      .foot-note { text-align: center; color: var(--ink-soft); font-size: .85rem; margin-top: 22px; }
+
+      /* ---------- Widget ---------- */
+      #widget-view { display: none; }
+      html[data-hatch-view="widget"] #app-view { display: none; }
+      html[data-hatch-view="widget"] #widget-view {
+        display: flex; flex-direction: column; justify-content: center; gap: 6px;
+        min-height: 100vh; padding: 14px; color: var(--ink);
+      }
+      html[data-hatch-view="widget"] body { background: transparent; }
+      .w-title { font-weight: 800; font-size: .95rem; }
+      .w-date { color: var(--ink-soft); font-size: .8rem; }
+      .w-row { display: flex; gap: 12px; margin-top: 4px; }
+      .w-stat { min-width: 0; }
+      .w-stat b { display: block; font-size: 1.7rem; line-height: 1.05; }
+      .w-stat span { font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); }
+      html[data-hatch-size="small"] #widget-view { padding: 10px; gap: 4px; }
+      html[data-hatch-size="small"] .w-title { font-size: .85rem; }
+      html[data-hatch-size="small"] .w-date { font-size: .7rem; }
+      html[data-hatch-size="small"] .w-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; width: 100%; }
+      html[data-hatch-size="small"] .w-stat b { font-size: 1.25rem; }
+      html[data-hatch-size="small"] .w-stat span { font-size: .58rem; letter-spacing: .01em; }
+      html[data-hatch-target="tv"] .wrap { max-width: 1100px; }
+      html[data-hatch-target="tv"] .brand h1 { font-size: 1.8rem; }
+    </style>
+  </head>
+  <body>
+    <!-- ================= APP ================= -->
+    <div id="app-view">
+      <div class="wrap">
+        <div class="topbar">
+          <div class="brand">
+            <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true">
+              <rect width="52" height="52" rx="10" fill="#ffffff"/>
+              <path d="M13 10 h8 v13 l13-13 h10 L29 26 l15 16 H33 L21 29 v13 h-8 z" fill="#009444"/>
+              <path d="M29 26 l15 16 H33 L24 32 z" fill="#8dc63f"/>
+            </svg>
+            <div>
+              <h1>Stok Harian Kinmart</h1>
+              <div class="date" id="today-label">—</div>
+            </div>
+          </div>
+          <div class="counts" role="status" aria-label="Ringkasan stok hari ini">
+            <div class="count ready"><b id="c-ready">0</b><span>Ready</span></div>
+            <div class="count kosong"><b id="c-kosong">0</b><span>Kosong</span></div>
+            <div class="count restok"><b id="c-restok">0</b><span>Restok</span></div>
+          </div>
+          <div class="actions">
+            <button class="btn undo" id="btn-undo" type="button">↩ Undo</button>
+            <button class="btn reset" id="btn-reset" type="button">Kembali ke Awal</button>
+          </div>
+        </div>
+
+        <nav class="tabs" aria-label="Menu">
+          <button class="tab active" type="button" data-tab="daftar">Daftar Barang</button>
+          <button class="tab" type="button" data-tab="input">Input Hari Ini</button>
+          <button class="tab" type="button" data-tab="kirim">Kirim WA</button>
+          <button class="tab" type="button" data-tab="cadangan">Cadangan</button>
+        </nav>
+
+        <!-- ===== Daftar Barang ===== -->
+        <section class="panel active" id="panel-daftar">
+          <div class="searchrow">
+            <input type="search" id="search" placeholder="Cari barang… (mis. cabe, sawi, telur)" aria-label="Cari barang" />
+          </div>
+          <div class="filters" role="group" aria-label="Filter status">
+            <button class="fchip active" type="button" data-filter="ALL">Semua</button>
+            <button class="fchip" type="button" data-filter="R">Ready</button>
+            <button class="fchip" type="button" data-filter="K">Kosong</button>
+            <button class="fchip" type="button" data-filter="S">Restok</button>
+          </div>
+          <div id="list"></div>
+          <div class="empty-note" id="list-empty" hidden>Tidak ada barang yang cocok dengan pencarian / filter ini.</div>
+        </section>
+
+        <!-- ===== Input Hari Ini ===== -->
+        <section class="panel" id="panel-input">
+          <div class="card">
+            <h2>❌ Kosong Hari Ini</h2>
+            <p class="hint">Centang barang yang hari ini kosong, lalu tekan Terapkan di bawah.</p>
+            <div class="searchrow" style="margin-bottom:10px">
+              <input type="search" id="search-kosong" placeholder="Cari barang kosong…" aria-label="Cari barang untuk daftar kosong" />
+            </div>
+            <div class="pick-list" id="pick-kosong"></div>
+          </div>
+          <div class="card">
+            <h2>🔄 Restok Hari Ini</h2>
+            <p class="hint">Centang barang yang hari ini restok, lalu tekan Terapkan di bawah.</p>
+            <div class="searchrow" style="margin-bottom:10px">
+              <input type="search" id="search-restok" placeholder="Cari barang restok…" aria-label="Cari barang untuk daftar restok" />
+            </div>
+            <div class="pick-list" id="pick-restok"></div>
+          </div>
+          <div class="card">
+            <div class="applybar" style="margin-top:0">
+              <span class="selinfo" id="sel-info">Belum ada centangan baru.</span>
+              <button class="btn" id="btn-clear-pick" type="button">Bersihkan Centang</button>
+              <button class="btn primary" id="btn-apply" type="button" disabled>Terapkan</button>
+            </div>
+            <p class="hint" style="margin:10px 0 0">Barang yang tidak dicentang statusnya tidak berubah. Kalau salah terapkan, tekan Undo di atas.</p>
+          </div>
+        </section>
+
+        <!-- ===== Kirim WA ===== -->
+        <section class="panel" id="panel-kirim">
+          <div class="card">
+            <h2>Nomor WA Atasan</h2>
+            <p class="hint">Isi sekali, tersimpan di HP ini. Kalau dikosongkan, nanti pilih sendiri kontak Owner Kinmart di WhatsApp.</p>
+            <div class="wa-input">
+              <input type="tel" id="wa-number" inputmode="tel" placeholder="Contoh: 0812xxxxxxx" aria-label="Nomor WhatsApp atasan" />
+              <button class="btn primary" id="btn-save-wa" type="button">Simpan Nomor</button>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Daftar yang Dikirim</h2>
+            <p class="hint" id="send-summary">—</p>
+            <ol class="steps">
+              <li>Tekan <b>Kirim Pesan 1</b>, lalu kirim di WhatsApp.</li>
+              <li>Balik ke sini, tekan <b>Kirim Pesan 2</b>, kirim lagi.</li>
+              <li>Terakhir <b>Kirim Pesan 3</b>. Selesai — 3 pesan berurutan.</li>
+            </ol>
+            <div id="messages"></div>
+            <p class="hint" style="margin:0">Tombol Salin bisa dipakai kalau mau menempel daftarnya manual di chat lain.</p>
+          </div>
+        </section>
+
+        <!-- ===== Cadangan ===== -->
+        <section class="panel" id="panel-cadangan">
+          <div class="card">
+            <h2>Export Data ke HP / Google Drive</h2>
+            <p class="hint">Export data stok supaya aman di luar aplikasi ini. Ke HP: file langsung terunduh. Ke Drive: menu bagikan HP terbuka, lalu pilih <b>Drive → Simpan ke Drive</b>.</p>
+            <div class="backup-btns">
+              <button class="btn primary" id="btn-export-hp" type="button">⬇ Export ke HP (File Backup JSON)</button>
+              <button class="btn" id="btn-export-drive" type="button">☁ Export ke Google Drive</button>
+              <button class="btn" id="btn-export-txt" type="button">📄 Export Laporan Hari Ini (TXT)</button>
+              <a class="btn" href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener" style="text-decoration:none">Buka Google Drive</a>
+            </div>
+            <p class="hint" style="margin:10px 0 0">Kalau menu bagikan tidak muncul di HP kamu, file-nya otomatis terunduh dulu — tinggal upload file itu lewat aplikasi Google Drive atau tombol <b>Buka Google Drive</b> di atas. Laporan TXT berisi daftar Ready, Kosong, dan Restok hari ini, enak dibaca / diteruskan.</p>
+          </div>
+          <div class="card">
+            <h2>Backup Data Stok</h2>
+            <p class="hint">Export untuk menyimpan data stok semua tanggal ke satu file. Import untuk mengembalikannya, misalnya setelah ganti HP.</p>
+            <div class="backup-btns">
+              <button class="btn" id="btn-export" type="button">⬇ Export Data (JSON)</button>
+              <label class="btn" for="import-file" style="margin:0">⬆ Import Data (JSON)</label>
+              <input type="file" id="import-file" accept="application/json,.json" hidden />
+            </div>
+          </div>
+        </section>
+
+        <p class="foot-note">94 barang baku Kinmart · Status awal: Ready 33 · Kosong 28 · Restok 33</p>
+      </div>
+    </div>
+
+    <!-- ================= WIDGET ================= -->
+    <section id="widget-view" aria-label="Ringkasan stok Kinmart">
+      <div class="w-title">Stok Kinmart</div>
+      <div class="w-date" id="w-date">—</div>
+      <div class="w-row">
+        <div class="w-stat"><b id="w-ready" style="color:var(--green)">0</b><span>Ready</span></div>
+        <div class="w-stat"><b id="w-kosong" style="color:var(--red)">0</b><span>Kosong</span></div>
+        <div class="w-stat"><b id="w-restok" style="color:var(--amber)">0</b><span>Restok</span></div>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+    (function () {
+      "use strict";
+
+      /* ===== Data baku: [nama, status awal] R=Ready K=Kosong S=Restok ===== */
+      var RAW = [
+        ["Apel Fuji","K"],["Bawang merah kupas","R"],["Bawang putih kupas","R"],
+        ["Bayam","K"],["Bayam baby","K"],["Bayam besar","K"],["Belimbing wuluh","K"],
+        ["Bombai","R"],["Brokoli","R"],["Buncis","R"],["Cabe bakul","K"],
+        ["Cabe hijau besar","S"],["Cabe keriting hijau","S"],["Cabe keriting merah","S"],
+        ["Cabe merah besar","S"],["Cabe rawit hijau","S"],["Cabe rawit merah","R"],
+        ["Daun bawang","R"],["Daun jeruk","S"],["Daun kemangi","R"],["Daun ketumbar","S"],
+        ["Daun kunyit","K"],["Daun salam","S"],["Daun sledri","R"],["Daun ubi","S"],
+        ["Gambas","S"],["Jagung baby","S"],["Jagung buah","S"],["Jahe","R"],
+        ["Jamur enoki","R"],["Jantung pisang","S"],["Jeruk lemon","S"],["Jeruk nipis","S"],
+        ["Jeruk sambal","K"],["Jeruk Sunkist","K"],["Kacang panjang","S"],["Kangkung","S"],
+        ["Kangkung baby","K"],["Kecambah","S"],["Kecipir","S"],["Kembang kol","S"],
+        ["Kencur","S"],["Kentang","R"],["Kol putih","R"],["Kol ungu","R"],["Kunyit","R"],
+        ["Labu air","R"],["Labu kuning","S"],["Labu siam","R"],["Labu siam baby","K"],
+        ["Lengkuas","R"],["Lobak","K"],["Mie tiaw","K"],["Nanas","K"],["Nangka sayur","K"],
+        ["Okra","K"],["Paket capcay","S"],["Paket pare","S"],["Paket sayur asam","S"],
+        ["Paket sop","S"],["Pakis hijau","K"],["Paprika hijau","K"],["Paprika kuning","K"],
+        ["Paprika merah","K"],["Pare","K"],["Petai kupas","R"],["Sawi kailan","K"],
+        ["Sawi kriting","K"],["Sawi manis","S"],["Sawi pakcoy","S"],["Sawi panjang","K"],
+        ["Sawi putih","R"],["Selada","R"],["Serai","R"],["Tahu","R"],["Tahu isi bakso","K"],
+        ["Telur asin","R"],["Telur ayam kampung","K"],["Telur ayam negri","R"],
+        ["Telur Omega","R"],["Telur puyuh","S"],["Tempe","R"],["Terong asam","K"],
+        ["Terong hijau","S"],["Terong lalap","K"],["Terong putih","R"],["Terong ungu","R"],
+        ["Timun","R"],["Timun baby","S"],["Tofu telur","R"],["Tomat hijau","S"],
+        ["Tomat juz","S"],["Tomat merah","R"],["Wortel","R"]
+      ];
+      var NAMES = RAW.map(function (r) { return r[0]; });
+      var INITIAL = {};
+      RAW.forEach(function (r) { INITIAL[r[0]] = r[1]; });
+      var LABEL = { R: "Ready", K: "Kosong", S: "Restok" };
+      var STORE_KEY = "kinmart-mandiri-v1";
+
+      /* ===== Tanggal hari ini (lokal) ===== */
+      function todayKey() {
+        var d = new Date();
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var t = String(d.getDate()).padStart(2, "0");
+        return d.getFullYear() + "-" + m + "-" + t;
+      }
+      function todayLabel() {
+        try {
+          return new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+        } catch (e) {
+          return todayKey();
+        }
+      }
+
+      /* ===== Penyimpanan lokal (di HP ini) ===== */
+      var store = { days: {}, wa: "" };
+      var storageOK = true;
+      try {
+        var saved = localStorage.getItem(STORE_KEY);
+        if (saved) {
+          var parsed = JSON.parse(saved);
+          if (parsed && typeof parsed === "object") {
+            store.days = parsed.days || {};
+            store.wa = parsed.wa || "";
+          }
+        }
+      } catch (e) { storageOK = false; }
+      function persist() {
+        if (!storageOK) return;
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) { storageOK = false; }
+      }
+
+      var DAY = todayKey();
+      function validStatuses(obj) {
+        var out = {};
+        NAMES.forEach(function (n) {
+          var v = obj && obj[n];
+          out[n] = (v === "R" || v === "K" || v === "S") ? v : INITIAL[n];
+        });
+        return out;
+      }
+      var state = validStatuses(store.days[DAY]);
+      function saveDay() { store.days[DAY] = state; persist(); }
+
+      /* ===== Undo (maks 20 langkah, selama sesi ini) ===== */
+      var undoStack = [];
+      function pushUndo() {
+        undoStack.push(JSON.stringify(state));
+        if (undoStack.length > 20) undoStack.shift();
+        syncUndoBtn();
+      }
+      function syncUndoBtn() {
+        var b = document.getElementById("btn-undo");
+        b.disabled = undoStack.length === 0;
+        b.textContent = undoStack.length ? "↩ Undo (" + undoStack.length + ")" : "↩ Undo";
+      }
+
+      /* ===== Elemen ===== */
+      function el(id) { return document.getElementById(id); }
+      var listEl = el("list"), toastEl = el("toast"), toastTimer = null;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+      }
+      function counts() {
+        var c = { R: 0, K: 0, S: 0 };
+        NAMES.forEach(function (n) { c[state[n]]++; });
+        return c;
+      }
+
+      /* ===== Render daftar barang ===== */
+      var filter = "ALL", query = "";
+      function renderList() {
+        var q = query.trim().toLowerCase();
+        var html = "", shown = 0;
+        NAMES.forEach(function (n) {
+          var st = state[n];
+          if (filter !== "ALL" && st !== filter) return;
+          if (q && n.toLowerCase().indexOf(q) === -1) return;
+          shown++;
+          html += '<div class="item">'
+            + '<div class="item-head"><span class="item-name">' + n + '</span>'
+            + '<span class="pill ' + st + '">' + LABEL[st] + '</span></div>'
+            + '<div class="seg" role="group" aria-label="Status ' + n + '">'
+            + '<button type="button" data-name="' + n + '" data-set="R" class="' + (st === "R" ? "on-R" : "") + '">READY</button>'
+            + '<button type="button" data-name="' + n + '" data-set="K" class="' + (st === "K" ? "on-K" : "") + '">KOSONG</button>'
+            + '<button type="button" data-name="' + n + '" data-set="S" class="' + (st === "S" ? "on-S" : "") + '">RESTOK</button>'
+            + '</div></div>';
+        });
+        listEl.innerHTML = html;
+        el("list-empty").hidden = shown > 0;
+      }
+      listEl.addEventListener("click", function (ev) {
+        var b = ev.target.closest("button[data-set]");
+        if (!b) return;
+        var n = b.getAttribute("data-name"), v = b.getAttribute("data-set");
+        if (state[n] === v) return;
+        pushUndo();
+        state[n] = v;
+        saveDay();
+        refresh();
+        toast(n + " → " + LABEL[v]);
+      });
+
+      /* ===== Render daftar centang Input Hari Ini ===== */
+      var pickK = {}, pickS = {};
+      function renderPicks() {
+        buildPickList(el("pick-kosong"), el("search-kosong").value, pickK, "K");
+        buildPickList(el("pick-restok"), el("search-restok").value, pickS, "S");
+        syncApply();
+      }
+      function buildPickList(container, qv, picks, target) {
+        var q = (qv || "").trim().toLowerCase();
+        var html = "";
+        NAMES.forEach(function (n) {
+          if (q && n.toLowerCase().indexOf(q) === -1) return;
+          var checked = picks[n] ? " checked" : "";
+          html += '<label class="pick"><input type="checkbox" data-pick="' + target + '" value="' + n + '"' + checked + ' />'
+            + '<span>' + n + '</span><span class="cur">sekarang: ' + LABEL[state[n]] + '</span></label>';
+        });
+        container.innerHTML = html || '<div class="empty-note">Tidak ada barang yang cocok.</div>';
+      }
+      function onPickChange(ev) {
+        var cb = ev.target;
+        if (!cb.matches || !cb.matches("input[data-pick]")) return;
+        var target = cb.getAttribute("data-pick"), n = cb.value;
+        if (target === "K") { pickK[n] = cb.checked; if (cb.checked) delete pickS[n]; }
+        else { pickS[n] = cb.checked; if (cb.checked) delete pickK[n]; }
+        renderPicks();
+      }
+      el("pick-kosong").addEventListener("change", onPickChange);
+      el("pick-restok").addEventListener("change", onPickChange);
+      el("search-kosong").addEventListener("input", renderPicks);
+      el("search-restok").addEventListener("input", renderPicks);
+      function pickCount() {
+        var a = Object.keys(pickK).filter(function (k) { return pickK[k]; }).length;
+        var b = Object.keys(pickS).filter(function (k) { return pickS[k]; }).length;
+        return { k: a, s: b, total: a + b };
+      }
+      function syncApply() {
+        var pc = pickCount();
+        el("btn-apply").disabled = pc.total === 0;
+        el("sel-info").textContent = pc.total === 0
+          ? "Belum ada centangan baru."
+          : "Terpilih: " + pc.k + " kosong, " + pc.s + " restok.";
+      }
+      el("btn-clear-pick").addEventListener("click", function () {
+        pickK = {}; pickS = {}; renderPicks();
+      });
+      el("btn-apply").addEventListener("click", function () {
+        var pc = pickCount();
+        if (pc.total === 0) return;
+        pushUndo();
+        Object.keys(pickK).forEach(function (n) { if (pickK[n]) state[n] = "K"; });
+        Object.keys(pickS).forEach(function (n) { if (pickS[n]) state[n] = "S"; });
+        pickK = {}; pickS = {};
+        saveDay();
+        refresh();
+        toast("Input hari ini diterapkan: " + pc.k + " kosong, " + pc.s + " restok.");
+      });
+
+      /* ===== Kirim WA: gabungan Ready+Restok, abjad A–Z, tepat 3 pesan ===== */
+      var sentFlags = [false, false, false];
+      function sendList() {
+        return NAMES.filter(function (n) { return state[n] === "R" || state[n] === "S"; })
+          .sort(function (a, b) { return a.localeCompare(b, "id"); });
+      }
+      function split3(arr) {
+        var groups = [[], [], []];
+        var base = Math.floor(arr.length / 3), rem = arr.length % 3, idx = 0;
+        for (var g = 0; g < 3; g++) {
+          var size = base + (g < rem ? 1 : 0);
+          groups[g] = arr.slice(idx, idx + size);
+          idx += size;
+        }
+        return groups;
+      }
+      function waLink(text) {
+        var num = (store.wa || "").replace(/\D/g, "");
+        if (num.charAt(0) === "0") num = "62" + num.slice(1);
+        var enc = encodeURIComponent(text);
+        return num ? "https://wa.me/" + num + "?text=" + enc
+                   : "https://api.whatsapp.com/send?text=" + enc;
+      }
+      function renderMessages() {
+        var list = sendList();
+        var groups = split3(list);
+        var c = counts();
+        el("send-summary").innerHTML =
+          "Yang dikirim: <b>" + list.length + " barang</b> (Ready " + c.R + " + Restok " + c.S +
+          "), digabung &amp; diurutkan abjad A–Z, dibagi 3 pesan. Barang Kosong (" + c.K + ") tidak dikirim.";
+        var html = "";
+        groups.forEach(function (g, i) {
+          var text = g.join("\n");
+          html += '<div class="msg' + (sentFlags[i] ? " sent" : "") + '" data-msg="' + i + '">'
+            + '<div class="msg-head"><b>Pesan ' + (i + 1) + ' dari 3</b>'
+            + '<span class="n">' + g.length + ' barang</span>'
+            + '<span class="sent-tag">✓ TERKIRIM</span></div>'
+            + (g.length
+                ? '<pre>' + text + '</pre>'
+                : '<pre style="color:var(--ink-soft)">(kosong)</pre>')
+            + '<div class="msg-foot">'
+            + '<button class="btn wa" type="button" data-send="' + i + '"' + (g.length ? "" : " disabled") + '>Kirim Pesan ' + (i + 1) + '</button>'
+            + '<button class="btn ghost" type="button" data-copy="' + i + '"' + (g.length ? "" : " disabled") + '>Salin</button>'
+            + '</div></div>';
+        });
+        el("messages").innerHTML = html;
+        el("messages").querySelectorAll("button[data-send]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var i = Number(b.getAttribute("data-send"));
+            var text = split3(sendList())[i].join("\n");
+            sentFlags[i] = true;
+            renderMessages();
+            window.open(waLink(text), "_blank");
+          });
+        });
+        el("messages").querySelectorAll("button[data-copy]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var i = Number(b.getAttribute("data-copy"));
+            var text = split3(sendList())[i].join("\n");
+            copyText(text, "Pesan " + (i + 1) + " tersalin. Tempel di WhatsApp.");
+          });
+        });
+      }
+      function copyText(text, okMsg) {
+        function done() { toast(okMsg); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+        } else { fallbackCopy(text); done(); }
+      }
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      /* ===== Nomor WA ===== */
+      el("wa-number").value = store.wa || "";
+      el("btn-save-wa").addEventListener("click", function () {
+        store.wa = el("wa-number").value.trim();
+        persist();
+        toast(store.wa ? "Nomor atasan tersimpan." : "Nomor dikosongkan — pilih kontak sendiri di WhatsApp.");
+      });
+
+      /* ===== Undo & Reset ===== */
+      el("btn-undo").addEventListener("click", function () {
+        if (!undoStack.length) return;
+        state = validStatuses(JSON.parse(undoStack.pop()));
+        saveDay();
+        syncUndoBtn();
+        refresh();
+        toast("Perubahan terakhir dibatalkan.");
+      });
+      var resetArmed = false, resetTimer = null;
+      el("btn-reset").addEventListener("click", function () {
+        var b = el("btn-reset");
+        if (!resetArmed) {
+          resetArmed = true;
+          b.classList.add("armed");
+          b.textContent = "Yakin? Tekan Sekali Lagi";
+          resetTimer = setTimeout(function () {
+            resetArmed = false; b.classList.remove("armed"); b.textContent = "Kembali ke Awal";
+          }, 3500);
+          return;
+        }
+        clearTimeout(resetTimer);
+        resetArmed = false;
+        b.classList.remove("armed");
+        b.textContent = "Kembali ke Awal";
+        pushUndo();
+        state = validStatuses(null);
+        saveDay();
+        refresh();
+        toast("Semua status kembali ke awal hari. Undo masih bisa dipakai.");
+      });
+
+      /* ===== Tabs, cari, filter ===== */
+      document.querySelectorAll(".tab").forEach(function (t) {
+        t.addEventListener("click", function () {
+          document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("active"); });
+          document.querySelectorAll(".panel").forEach(function (x) { x.classList.remove("active"); });
+          t.classList.add("active");
+          el("panel-" + t.getAttribute("data-tab")).classList.add("active");
+          if (t.getAttribute("data-tab") === "kirim") { sentFlags = [false, false, false]; renderMessages(); }
+          window.scrollTo({ top: 0 });
+        });
+      });
+      el("search").addEventListener("input", function () { query = this.value; renderList(); });
+      document.querySelectorAll(".fchip").forEach(function (ch) {
+        ch.addEventListener("click", function () {
+          document.querySelectorAll(".fchip").forEach(function (x) { x.classList.remove("active"); });
+          ch.classList.add("active");
+          filter = ch.getAttribute("data-filter");
+          renderList();
+        });
+      });
+
+      /* ===== Cadangan: export & import data ===== */
+      function download(name, content, type) {
+        var blob = new Blob([content], { type: type });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+      }
+      function backupJSON() {
+        saveDay();
+        return JSON.stringify({ app: "stok-harian-kinmart-mandiri", exported: DAY, wa: store.wa, days: store.days }, null, 2);
+      }
+      /* Bagikan file lewat menu bagikan HP (di sana ada pilihan "Simpan ke Drive").
+         Kalau HP/browser tidak mendukung, file diunduh ke HP sebagai gantinya. */
+      function shareOrDownload(name, content, type) {
+        var file = null;
+        try { file = new File([content], name, { type: type }); } catch (e) { file = null; }
+        if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: name }).then(function () {
+            toast("File dibagikan. Kalau tadi pilih Drive, file sudah tersimpan di Drive kamu.");
+          }, function (err) {
+            if (err && err.name === "AbortError") return;
+            download(name, content, type);
+            toast("Menu bagikan gagal — file diunduh ke HP.");
+          });
+          return;
+        }
+        download(name, content, type);
+        toast("Menu bagikan tidak tersedia di HP ini — file diunduh. Upload file itu lewat aplikasi Google Drive.");
+      }
+      el("btn-export").addEventListener("click", function () {
+        download("backup-stok-kinmart-" + DAY + ".json", backupJSON(), "application/json");
+        toast("Backup data terunduh.");
+      });
+      el("btn-export-hp").addEventListener("click", function () {
+        download("backup-stok-kinmart-" + DAY + ".json", backupJSON(), "application/json");
+        toast("Backup data terunduh ke HP.");
+      });
+      el("btn-export-drive").addEventListener("click", function () {
+        shareOrDownload("backup-stok-kinmart-" + DAY + ".json", backupJSON(), "application/json");
+      });
+      el("btn-export-txt").addEventListener("click", function () {
+        var c = counts();
+        var lines = ["Stok Harian Kinmart — " + todayLabel(), ""];
+        ["R", "K", "S"].forEach(function (st) {
+          lines.push(LABEL[st] + " (" + c[st] + "):");
+          NAMES.filter(function (n) { return state[n] === st; })
+            .sort(function (a, b) { return a.localeCompare(b, "id"); })
+            .forEach(function (n) { lines.push("- " + n); });
+          lines.push("");
+        });
+        download("stok-kinmart-" + DAY + ".txt", lines.join("\n"), "text/plain");
+        toast("Laporan hari ini terunduh (TXT).");
+      });
+      el("import-file").addEventListener("change", function () {
+        var f = this.files && this.files[0];
+        if (!f) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var data = JSON.parse(String(reader.result));
+            if (!data || typeof data !== "object" || !data.days) throw new Error("bad");
+            pushUndo();
+            store.days = data.days;
+            if (typeof data.wa === "string") { store.wa = data.wa; el("wa-number").value = store.wa; }
+            state = validStatuses(store.days[DAY]);
+            persist();
+            refresh();
+            toast("Data berhasil di-import.");
+          } catch (e) {
+            toast("File tidak cocok — import dibatalkan.");
+          }
+        };
+        reader.readAsText(f);
+        this.value = "";
+      });
+
+      /* ===== Refresh semua tampilan ===== */
+      function refresh() {
+        var c = counts();
+        el("c-ready").textContent = c.R;
+        el("c-kosong").textContent = c.K;
+        el("c-restok").textContent = c.S;
+        el("w-ready").textContent = c.R;
+        el("w-kosong").textContent = c.K;
+        el("w-restok").textContent = c.S;
+        renderList();
+        renderPicks();
+        renderMessages();
+      }
+
+      el("today-label").innerHTML = "<strong>" + todayLabel() + "</strong> · 94 barang";
+      el("w-date").textContent = todayLabel();
+      syncUndoBtn();
+      saveDay();
+      refresh();
+    })();
+    </script>
+  </body>
+</html>
