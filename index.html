@@ -121,7 +121,7 @@
          mana-mana. Navigasi bawah fixed, dengan ruang kosong di bawah isi supaya
          tidak menutupi tombol barang terakhir. */
       #app-view { display: block; min-height: 100vh; min-height: 100dvh; }
-      .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px calc(108px + env(safe-area-inset-bottom)); width: 100%; display: block; }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px calc(176px + env(safe-area-inset-bottom)); width: 100%; display: block; }
 
       /* ---------- Bar judul ramping (satu-satunya yang menempel di atas) ---------- */
       .topbar {
@@ -176,6 +176,21 @@
       .btn:disabled { opacity: .45; cursor: default; }
       .btn.undo { flex: 1; background: linear-gradient(120deg, var(--ready-1), var(--ready-mid) 55%, var(--ready-2)); border-color: transparent; color: var(--on-ready); box-shadow: var(--glow-green); font-weight: 800; letter-spacing: .01em; }
       .btn.undo:disabled { background: var(--chip); border-color: var(--line); color: var(--ink-soft); box-shadow: none; font-weight: 600; }
+      /* Tombol Undo MELAYANG — selalu tampil di mana pun: semua tab, semua posisi
+         scroll. Nempel di KIRI bawah, tepat di atas navigasi bawah: sisi kiri baris
+         barang hanya berisi ubin huruf + nama (bukan tombol), jadi pill ini tidak
+         pernah menutupi tombol Ready/Kosong yang ada di sisi kanan baris. */
+      .undo-fab {
+        position: fixed; z-index: 46;
+        left: max(14px, calc(50% - 366px));
+        bottom: calc(80px + env(safe-area-inset-bottom));
+        min-height: 50px; padding: 10px 20px; border-radius: 999px;
+        font-size: .98rem; white-space: nowrap;
+        box-shadow: var(--glow-green), 0 14px 30px rgba(5, 8, 7, .35);
+      }
+      .undo-fab:disabled { opacity: .82; box-shadow: 0 8px 20px rgba(5, 8, 7, .22); }
+      html[data-hatch-target="tv"] .undo-fab { left: max(14px, calc(50% - 536px)); }
+      html[data-hatch-view="widget"] .undo-fab { display: none !important; }
       .btn.reset { color: var(--red-dark); border-color: #ffb3c0; flex: 1; }
       .btn.reset.armed { background: var(--red); border-color: var(--red); color: #fff; box-shadow: var(--glow-red); }
       @media (prefers-color-scheme: dark) { .btn.reset { color: #ff7a90; border-color: #5c1a28; } .btn.reset.armed { color:#fff; } }
@@ -381,7 +396,7 @@
       .install-head p { margin: 0; color: var(--ink-soft); font-size: .92rem; }
 
       .toast {
-        position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
+        position: fixed; left: 50%; bottom: calc(146px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
         background: var(--ink); color: var(--bg); padding: 11px 18px; border-radius: 999px;
         font-weight: 600; font-size: .95rem; opacity: 0; pointer-events: none;
         transition: opacity .2s, transform .2s; z-index: 50; max-width: 88vw; text-align: center;
@@ -561,7 +576,6 @@
             <div class="stock-bar-label"><span id="bar-ready-label">Ready 0%</span><span id="bar-kosong-label">Kosong 0%</span></div>
           </div>
           <div class="actions">
-            <button class="btn undo" id="btn-undo" type="button">↩ Undo</button>
             <button class="btn reset" id="btn-reset" type="button">Kembali ke Awal</button>
           </div>
           <div class="datenav">
@@ -611,7 +625,7 @@
               <button class="btn" id="btn-clear-pick" type="button">Bersihkan Centang</button>
               <button class="btn primary" id="btn-apply" type="button" disabled>Terapkan</button>
             </div>
-            <p class="hint" style="margin:10px 0 0">Barang yang tidak dicentang statusnya tidak berubah. Kalau salah terapkan, tekan Undo di tab Daftar.</p>
+            <p class="hint" style="margin:10px 0 0">Barang yang tidak dicentang statusnya tidak berubah. Kalau salah terapkan, tekan tombol Undo yang selalu tampil di kiri bawah layar.</p>
           </div>
         </section>
 
@@ -808,6 +822,7 @@
 
         <p class="foot-note">94 barang baku Kinmart · Status awal: Ready 66 · Kosong 28</p>
       </div>
+        <button class="btn undo undo-fab" id="btn-undo" type="button" aria-label="Batalkan perubahan terakhir (Undo)">↩ Undo</button>
         <nav class="tabs" aria-label="Menu">
           <button class="tab active" type="button" data-tab="daftar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></svg>Daftar</button>
           <button class="tab" type="button" data-tab="input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M9.2 16.8l.7-2.7 5-5 2 2-5 5-2.7.7z"/></svg>Input</button>
