@@ -10,12 +10,15 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png?v=3" />
     <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3" />
     <link rel="manifest" href="assets/manifest.json?v=3" />
-    <meta name="theme-color" content="#009444" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <meta name="theme-color" content="#050807" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Stok Kinmart" />
-    <meta name="description" content="Cek stok harian Kinmart — Ready, Kosong, Restok — lalu kirim daftarnya ke WhatsApp atasan." />
+    <meta name="description" content="Cek stok harian Kinmart — Ready atau Kosong — lalu kirim daftar Ready-nya ke WhatsApp atasan." />
     <title>Stok Harian Kinmart Mandiri</title>
     <script id="hatch-space-target">
     (() => {
@@ -37,196 +40,272 @@
     </script>
     <style>
       :root {
-        --green: #009444;
-        --green-dark: #00702f;
-        --lime: #8dc63f;
-        --red: #d92d20;
-        --red-dark: #b42318;
-        --amber: #dc7a06;
-        --amber-dark: #b45f04;
-        --bg: #eef3ea;
+        /* NEON ELITE — tegas & clear, bukan kusam, bukan norak:
+           Volt Green #00FF7A (Ready) · Neon Coral #FF2442 (Kosong) ·
+           Cyan Signal #00E5FF (aksen fokus) · Obsidian #050807 (dasar elit) */
+        --green: #00c853;
+        --green-neon: #00ff7a;
+        --green-dark: #00913f;
+        --green-soft: #e6fff0;
+        --lime: #00ff7a;
+        --red: #ff2442;
+        --red-neon: #ff2442;
+        --red-dark: #d6002b;
+        --red-soft: #ffeef1;
+        --cyan: #00e5ff;
+        --amber: #ffb800;
+        --amber-dark: #9a6d00;
+        --obsidian: #050807;
+        --obsidian-2: #0b120e;
+        --bg: #eef1ef;
         --surface: #ffffff;
-        --surface-2: #f4f8f1;
-        --ink: #17251a;
-        --ink-soft: #4c5d4f;
-        --line: #d8e2d2;
-        --chip: #e6efe1;
-        --shadow: 0 1px 3px rgba(23, 60, 30, .10);
-        --radius: 14px;
+        --surface-2: #e8edea;
+        --ink: #070d09;
+        --ink-soft: #5f6f63;
+        --line: #dde5df;
+        --chip: #e8edea;
+        --shadow: 0 12px 32px rgba(5, 12, 8, .10);
+        --shadow-sm: 0 4px 16px rgba(5, 12, 8, .08);
+        --glow-green: 0 10px 28px rgba(0, 255, 122, .32), 0 2px 8px rgba(0, 200, 83, .22);
+        --glow-red: 0 10px 28px rgba(255, 36, 66, .30), 0 2px 8px rgba(255, 36, 66, .18);
+        --radius: 18px;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --bg: #10150f;
-          --surface: #1a211a;
-          --surface-2: #222b21;
-          --ink: #eef5ec;
-          --ink-soft: #a9bda6;
-          --line: #33402f;
-          --chip: #26331f;
-          --shadow: 0 1px 3px rgba(0,0,0,.4);
+          --bg: #050807;
+          --surface: #0f1511;
+          --surface-2: #171f19;
+          --green-soft: #0d2b1a;
+          --red-soft: #2e0d14;
+          --ink: #f2fff6;
+          --ink-soft: #9db3a3;
+          --line: #223028;
+          --chip: #171f19;
+          --shadow: 0 12px 32px rgba(0,0,0,.55);
+          --shadow-sm: 0 4px 16px rgba(0,0,0,.5);
         }
       }
       * { box-sizing: border-box; }
-      html { -webkit-text-size-adjust: 100%; }
+      html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 180px; }
       body {
         margin: 0;
         background: var(--bg);
         color: var(--ink);
-        font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-family: "Poppins", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
         line-height: 1.45;
       }
       button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2.25rem; }
       button { font: inherit; cursor: pointer; }
-      .wrap { max-width: 760px; margin: 0 auto; padding: 0 14px 48px; }
+      button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+      #app-view { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
       /* ---------- Header ---------- */
       .topbar {
-        position: sticky; top: 0; z-index: 20;
+        flex: none;
         background: var(--bg);
-        padding: 12px 0 10px;
+        padding: 10px 0 10px;
       }
       .brand { display: flex; align-items: center; gap: 12px; }
-      .brand img { flex: none; border-radius: 10px; box-shadow: var(--shadow); border: 1px solid var(--line); background: #fff; }
-      .brand h1 { font-size: 1.28rem; margin: 0; letter-spacing: .01em; line-height: 1.15; }
-      .brand .date { color: var(--ink-soft); font-size: .92rem; margin-top: 2px; }
-      .brand .date strong { color: var(--ink); }
+      .brand img { flex: none; border-radius: 14px; box-shadow: var(--shadow-sm); background: #fff; }
+      .brand h1 { font-size: 1.28rem; margin: 0; letter-spacing: -.02em; line-height: 1.15; font-weight: 800; }
+      .brand .date { color: var(--ink-soft); font-size: .88rem; margin-top: 2px; font-weight: 500; }
+      .brand .date strong { color: var(--ink); font-weight: 600; }
 
-      .counts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
-      .count {
-        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-        padding: 9px 10px; text-align: center; box-shadow: var(--shadow);
+      /* Kartu ringkasan ELITE — obsidian pekat + angka neon menyala jernih */
+      .summary {
+        background: linear-gradient(145deg, #0d1711 0%, #050807 55%, #0a1410 100%); color: #fff; border-radius: 22px;
+        padding: 16px 18px; margin-top: 10px;
+        border: 1px solid rgba(0, 255, 122, .38);
+        box-shadow: 0 18px 38px rgba(5, 8, 7, .34), 0 0 0 1px rgba(0,0,0,.4), 0 0 28px rgba(0, 255, 122, .12);
       }
-      .count b { display: block; font-size: 1.55rem; line-height: 1.1; }
-      .count span { font-size: .82rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
-      .count.ready b, .count.ready span { color: var(--green-dark); }
-      .count.kosong b, .count.kosong span { color: var(--red); }
-      .count.restok b, .count.restok span { color: var(--amber); }
-      @media (prefers-color-scheme: dark) {
-        .count.ready b, .count.ready span { color: #4cc97e; }
-        .count.kosong b, .count.kosong span { color: #ff8a7a; }
-        .count.restok b, .count.restok span { color: #ffb35c; }
-      }
+      .summary-top { display: flex; align-items: stretch; gap: 16px; }
+      .summary .stat { flex: 1; min-width: 0; }
+      .summary .stat b { display: block; font-size: 2rem; line-height: 1; font-weight: 800; letter-spacing: -.02em; }
+      .summary .stat:first-child b { color: var(--green-neon); text-shadow: 0 0 18px rgba(0, 255, 122, .55); }
+      .summary .stat:last-child b { color: #ff4d68; text-shadow: 0 0 18px rgba(255, 36, 66, .55); }
+      .summary .stat span { display: block; font-size: .92rem; font-weight: 700; margin-top: 6px; letter-spacing: .06em; text-transform: uppercase; }
+      .summary .stat small { display: block; font-size: .78rem; opacity: .72; margin-top: 1px; }
+      .summary .divider { width: 1px; background: rgba(255,255,255,.16); flex: none; }
+      .stock-bar { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.14); margin-top: 12px; }
+      .stock-bar .bar-ready { background: var(--green-neon); box-shadow: 0 0 12px rgba(0,255,122,.8); transition: width .3s ease; }
+      .stock-bar .bar-kosong { background: var(--red-neon); box-shadow: 0 0 12px rgba(255,36,66,.8); transition: width .3s ease; }
+      .stock-bar-label { display: flex; justify-content: space-between; font-size: .8rem; color: rgba(255,255,255,.92); margin-top: 6px; font-weight: 700; letter-spacing: .02em; }
 
-      .actions { display: flex; gap: 8px; margin-top: 10px; }
+      .actions { display: flex; gap: 10px; margin-top: 10px; }
       .btn {
-        border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-        border-radius: 10px; padding: 8px 14px; font-weight: 600; min-height: 40px;
+        border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+        border-radius: 12px; padding: 8px 14px; font-weight: 600; min-height: 44px;
         display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+        font-size: .93rem;
       }
       .btn:disabled { opacity: .45; cursor: default; }
-      .btn.undo { flex: 1; }
-      .btn.reset { color: var(--red-dark); border-color: var(--line); }
-      .btn.reset.armed { background: var(--red); border-color: var(--red); color: #fff; }
-      @media (prefers-color-scheme: dark) { .btn.reset { color: #ff8a7a; } .btn.reset.armed { color:#fff; } }
-      .btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
-      .btn.primary:disabled { background: var(--chip); border-color: var(--line); color: var(--ink-soft); }
-      .btn.wa { background: #1faa55; border-color: #1faa55; color: #fff; flex: 1; }
-      .btn.ghost { flex: 0 0 auto; }
+      .btn.undo { flex: 1; background: linear-gradient(120deg, #00ff7a, #00d95f 55%, #00c853); border-color: transparent; color: #03130a; box-shadow: var(--glow-green); font-weight: 800; letter-spacing: .01em; }
+      .btn.undo:disabled { background: var(--chip); border-color: var(--line); color: var(--ink-soft); box-shadow: none; font-weight: 600; }
+      .btn.reset { color: var(--red-dark); border-color: #ffb3c0; flex: 1; }
+      .btn.reset.armed { background: var(--red); border-color: var(--red); color: #fff; box-shadow: var(--glow-red); }
+      @media (prefers-color-scheme: dark) { .btn.reset { color: #ff7a90; border-color: #5c1a28; } .btn.reset.armed { color:#fff; } }
+      .btn.primary { background: linear-gradient(120deg, #00ff7a, #00d95f 55%, #00c853); border-color: transparent; color: #03130a; box-shadow: var(--glow-green); font-weight: 800; }
+      .btn.primary:disabled { background: var(--chip); border-color: var(--line); color: var(--ink-soft); box-shadow: none; font-weight: 600; }
+      .btn.wa { background: linear-gradient(120deg, #00ff7a, #00d95f 55%, #00c853); border-color: transparent; color: #03130a; flex: 1; box-shadow: var(--glow-green); font-weight: 800; }
+      .btn.ghost { flex: 0 0 auto; background: var(--surface-2); border-color: transparent; }
       .btn.armed { background: var(--red); border-color: var(--red); color: #fff; }
 
       /* ---------- Navigasi tanggal & histori ---------- */
-      .datenav { display: flex; gap: 6px; margin-top: 10px; align-items: stretch; }
+      .datenav { display: flex; gap: 8px; margin-top: 8px; align-items: stretch; }
       .datenav input[type="date"] {
-        flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 10px;
-        padding: 8px 10px; font: inherit; font-weight: 600;
-        background: var(--surface); color: var(--ink); min-height: 40px;
+        flex: 1; min-width: 0; border: 1.5px solid var(--line); border-radius: 12px;
+        padding: 8px 12px; font: inherit; font-weight: 600;
+        background: var(--surface); color: var(--ink); min-height: 44px;
       }
-      .datenav .btn { min-height: 40px; padding: 8px 12px; }
-      .saved-label { margin-top: 7px; font-size: .85rem; color: var(--green-dark); font-weight: 600; }
-      @media (prefers-color-scheme: dark) { .saved-label { color: #4cc97e; } }
+      .datenav .btn { min-height: 44px; padding: 8px 14px; }
+      .saved-label { margin-top: 6px; font-size: .84rem; color: var(--green-dark); font-weight: 700; }
+      @media (prefers-color-scheme: dark) { .saved-label { color: var(--green-neon); } }
       .history-banner {
         display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-        margin-top: 10px; padding: 10px 12px; border-radius: 10px;
-        background: #fdeed3; border: 1px solid var(--amber); color: #6b4303; font-size: .92rem;
+        margin-top: 8px; padding: 10px 12px; border-radius: 14px;
+        background: #fdf0d5; border: 1px solid var(--amber); color: #6b4303; font-size: .92rem;
       }
       .history-banner span { flex: 1; min-width: 180px; }
       .history-banner .btn { background: var(--surface); }
       @media (prefers-color-scheme: dark) { .history-banner { background: #463311; color: #ffc06e; } }
       .storage-warning {
-        margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+        margin-top: 10px; padding: 12px 14px; border-radius: 14px;
         background: #fde3e0; border: 1px solid var(--red); color: var(--red-dark); font-size: .92rem; font-weight: 600;
       }
       @media (prefers-color-scheme: dark) { .storage-warning { background: #47201c; color: #ff9d8f; } }
       .hist-item {
-        display: flex; align-items: center; gap: 8px; padding: 10px 0;
+        display: flex; align-items: center; gap: 8px; padding: 12px 0;
         border-bottom: 1px solid var(--line);
       }
       .hist-item:last-child { border-bottom: 0; }
       .hist-main { flex: 1; min-width: 0; }
-      .hist-main b { font-size: 1rem; }
+      .hist-main b { font-size: 1rem; font-weight: 600; }
       .hist-sub { color: var(--ink-soft); font-size: .86rem; margin-top: 1px; }
       .hist-today {
-        font-size: .7rem; font-weight: 800; letter-spacing: .04em; vertical-align: 2px;
-        background: #dff3e4; color: var(--green-dark); padding: 3px 8px; border-radius: 999px;
+        font-size: .68rem; font-weight: 800; letter-spacing: .04em; vertical-align: 2px;
+        background: #03130a; color: var(--green-neon); padding: 3px 8px; border-radius: 999px;
       }
-      @media (prefers-color-scheme: dark) { .hist-today { background: #173d24; color: #6fe39a; } }
+      @media (prefers-color-scheme: dark) { .hist-today { background: #0d2b1a; color: var(--green-neon); } }
       .hist-del { color: var(--red-dark); flex: none; }
-      @media (prefers-color-scheme: dark) { .hist-del { color: #ff8a7a; } }
-      .hist-item .btn { flex: none; padding: 8px 12px; }
+      @media (prefers-color-scheme: dark) { .hist-del { color: #ff7a90; } }
+      .hist-item .btn { flex: none; padding: 8px 12px; min-height: 40px; }
 
-      /* ---------- Tabs ---------- */
-      .tabs { display: flex; gap: 6px; margin: 14px 0 12px; flex-wrap: wrap; }
-      .tab {
-        flex: 1 1 auto; border: 1px solid var(--line); background: var(--surface);
-        border-radius: 999px; padding: 9px 10px; font-weight: 700; font-size: .95rem;
-        color: var(--ink-soft); min-height: 42px; white-space: nowrap;
+      /* ---------- Navigasi bawah ala Famy ---------- */
+      .tabs {
+        position: static; flex: none; order: 99;
+        width: 100%; z-index: 40;
+        display: flex; gap: 2px; margin: 8px 0 0;
+        background: var(--obsidian); border-top: 1px solid rgba(0,255,122,.22);
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -10px 30px rgba(5, 8, 7, .28);
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
       }
-      .tab.active { background: var(--green); border-color: var(--green); color: #fff; }
-      .panel { display: none; }
-      .panel.active { display: block; }
+      .tab {
+        flex: 1 1 0; border: none; background: transparent;
+        border-radius: 12px; padding: 5px 2px; min-height: 50px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+        font-weight: 600; font-size: .68rem; color: #8fa698;
+      }
+      .tab svg { width: 23px; height: 23px; flex: none; }
+      .tab.active { color: var(--green-neon); background: rgba(0, 255, 122, .13); box-shadow: inset 0 0 0 1px rgba(0,255,122,.35), 0 0 16px rgba(0,255,122,.12); }
+      @media (prefers-color-scheme: dark) { .tab.active { color: var(--green-neon); background: rgba(0, 255, 122, .13); } }
+      .panel { display: none; margin-top: 12px; }
+      .panel.active { display: block; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-bottom: 28px; }
 
       /* ---------- Daftar ---------- */
       .searchrow { display: flex; gap: 8px; }
-      .searchrow input[type="search"] {
-        flex: 1; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
-        font: inherit; background: var(--surface); color: var(--ink); min-height: 44px; width: 100%;
+      .searchbox { position: relative; flex: 1; min-width: 0; }
+      .searchbox > svg {
+        position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+        width: 19px; height: 19px; color: var(--ink-soft); pointer-events: none;
       }
-      .filters { display: flex; gap: 6px; margin: 10px 0 12px; flex-wrap: wrap; }
+      .searchbox input[type="search"] {
+        width: 100%; border: 1.5px solid transparent; border-radius: 14px; padding: 10px 12px 10px 42px;
+        font: inherit; font-weight: 500; background: var(--surface-2); color: var(--ink); min-height: 48px;
+      }
+      .searchbox input[type="search"]:focus { outline: none; border-color: var(--cyan); background: var(--surface); box-shadow: 0 0 0 3px rgba(0,229,255,.16), 0 0 18px rgba(0,229,255,.10); }
+      .searchbox input[type="search"]::placeholder { color: var(--ink-soft); }
+      .filters { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
       .fchip {
         border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
-        border-radius: 999px; padding: 7px 14px; font-weight: 600; min-height: 38px;
+        border-radius: 999px; padding: 8px 16px; font-weight: 700; min-height: 38px; font-size: .9rem;
       }
-      .fchip.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+      .fchip.active { background: var(--obsidian); color: #fff; border-color: var(--obsidian); box-shadow: 0 8px 20px rgba(5,8,7,.28); }
+      .fchip[data-filter="R"].active { background: linear-gradient(120deg, #00ff7a, #00c853); color: #03130a; border-color: transparent; box-shadow: var(--glow-green); }
+      .fchip[data-filter="K"].active { background: linear-gradient(120deg, #ff4d68, #ff2442 55%, #d6002b); color: #fff; border-color: transparent; box-shadow: var(--glow-red); }
+      #list { display: flex; flex-direction: column; gap: 10px; }
+      /* Baris barang NEON ELITE full color — 1 item per baris, tanpa simbol.
+         Ready: volt green neon + teks hitam pekat (kontras paling tegas).
+         Kosong: coral neon + teks putih jernih. Glow tipis & terkontrol = elit, bukan norak. */
       .item {
-        background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-        padding: 10px 12px; margin-bottom: 8px; box-shadow: var(--shadow);
+        border-radius: var(--radius);
+        padding: 12px;
+        display: flex; flex-direction: row; align-items: center; gap: 12px;
+        scroll-margin-bottom: 170px;
       }
-      .item-head { display: flex; align-items: center; gap: 8px; }
-      .item-name { font-weight: 600; font-size: 1.02rem; flex: 1; min-width: 0; }
+      .item.R {
+        background: linear-gradient(118deg, #00ff7a 0%, #00e664 42%, #00c853 100%);
+        color: #03130a;
+        border: 1px solid rgba(0, 255, 122, .65);
+        box-shadow: var(--glow-green), inset 0 1px 0 rgba(255,255,255,.45);
+      }
+      .item.K {
+        background: linear-gradient(118deg, #ff5c78 0%, #ff2442 48%, #d6002b 100%);
+        color: #fff;
+        border: 1px solid rgba(255, 92, 120, .55);
+        box-shadow: var(--glow-red), inset 0 1px 0 rgba(255,255,255,.32);
+      }
+      .tile {
+        position: relative; border-radius: 12px; width: 48px; height: 48px; flex: none;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .item.R .tile { background: rgba(3, 19, 10, .16); box-shadow: inset 0 0 0 1px rgba(3,19,10,.18); }
+      .item.K .tile { background: rgba(255,255,255,.20); box-shadow: inset 0 0 0 1px rgba(255,255,255,.32); }
+      .tile .mono { font-size: 1.55rem; font-weight: 800; line-height: 1; }
+      .item.R .tile .mono { color: #03130a; }
+      .item.K .tile .mono { color: #fff; }
+      .item-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
       .pill {
-        flex: none; font-size: .74rem; font-weight: 800; letter-spacing: .05em;
-        padding: 4px 9px; border-radius: 999px; text-transform: uppercase;
+        position: static;
+        font-size: .64rem; font-weight: 800; letter-spacing: .07em;
+        padding: 3px 9px; border-radius: 999px; text-transform: uppercase;
       }
-      .pill.R { background: #dff3e4; color: var(--green-dark); }
-      .pill.K { background: #fde3e0; color: var(--red-dark); }
-      .pill.S { background: #fdeed3; color: var(--amber-dark); }
-      @media (prefers-color-scheme: dark) {
-        .pill.R { background: #173d24; color: #6fe39a; }
-        .pill.K { background: #47201c; color: #ff9d8f; }
-        .pill.S { background: #463311; color: #ffc06e; }
-      }
-      .seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 9px; }
+      .pill.R { background: #03130a; color: var(--green-neon); }
+      .pill.K { background: #fff; color: #d6002b; }
+      .item-name { font-weight: 700; font-size: .98rem; line-height: 1.3; word-break: break-word; }
+      .item.R .item-name { color: #03130a; }
+      .item.K .item-name { color: #fff; }
+      .seg { display: flex; gap: 6px; flex: none; margin: 0; padding: 0; }
       .seg button {
-        border-radius: 9px; border: 1.5px solid var(--line); background: var(--surface-2);
-        font-weight: 800; font-size: .86rem; letter-spacing: .03em; padding: 9px 4px; min-height: 42px;
-        color: var(--ink-soft);
+        border-radius: 999px; font-weight: 800; font-size: .8rem; letter-spacing: .03em; text-transform: uppercase;
+        padding: 9px 12px; min-height: 42px;
+        white-space: nowrap; scroll-margin-bottom: 170px;
       }
-      .seg button.on-R { background: var(--green); border-color: var(--green); color: #fff; }
-      .seg button.on-K { background: var(--red); border-color: var(--red); color: #fff; }
-      .seg button.on-S { background: var(--amber); border-color: var(--amber); color: #fff; }
+      .item.R .seg button { border: 1.5px solid rgba(3,19,10,.35); background: rgba(255,255,255,.22); color: rgba(3,19,10,.82); }
+      .item.K .seg button { border: 1.5px solid rgba(255,255,255,.55); background: rgba(255,255,255,.16); color: rgba(255,255,255,.94); }
+      @media (max-width: 480px) {
+        .item { gap: 10px; padding: 10px; }
+        .tile { width: 44px; height: 44px; border-radius: 11px; }
+        .tile .mono { font-size: 1.4rem; }
+        .item-name { font-size: .92rem; }
+        .seg button { padding: 8px 9px; font-size: .72rem; min-height: 40px; }
+      }
+      .seg button.on-R { background: #03130a !important; color: var(--green-neon) !important; border-color: #03130a !important; box-shadow: 0 6px 16px rgba(3,19,10,.30); }
+      .seg button.on-K { background: #ffffff !important; color: #d6002b !important; border-color: #ffffff !important; box-shadow: 0 6px 16px rgba(0,0,0,.20); }
       .empty-note { text-align: center; color: var(--ink-soft); padding: 26px 10px; }
 
-      /* ---------- Input hari ini ---------- */
+      /* ---------- Kartu panel ---------- */
       .card {
         background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-        padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow);
+        padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow-sm);
       }
-      .card h2 { font-size: 1.05rem; margin: 0 0 4px; }
+      .card h2 { font-size: 1.05rem; margin: 0 0 4px; font-weight: 700; }
       .card p.hint { margin: 0 0 10px; color: var(--ink-soft); font-size: .92rem; }
-      .pick-list { max-height: 300px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+      .pick-list { max-height: 300px; overflow: auto; border: 1px solid var(--line); border-radius: 14px; }
       .pick {
-        display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 44px;
-        border-bottom: 1px solid var(--line); cursor: pointer; font-weight: 550;
+        display: flex; align-items: center; gap: 10px; padding: 11px 12px; min-height: 48px;
+        border-bottom: 1px solid var(--line); cursor: pointer; font-weight: 500;
       }
       .pick:last-child { border-bottom: 0; }
       .pick input { width: 22px; height: 22px; flex: none; accent-color: var(--green); }
@@ -237,44 +316,119 @@
       /* ---------- Kirim WA ---------- */
       .wa-input { display: flex; gap: 8px; flex-wrap: wrap; }
       .wa-input input {
-        flex: 1; min-width: 180px; border: 1px solid var(--line); border-radius: 10px;
-        padding: 10px 12px; font: inherit; background: var(--surface); color: var(--ink); min-height: 44px;
+        flex: 1; min-width: 180px; border: 1.5px solid var(--line); border-radius: 12px;
+        padding: 10px 12px; font: inherit; background: var(--surface); color: var(--ink); min-height: 48px;
       }
-      .msg { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); }
+      .msg { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
       .msg-head {
-        display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+        display: flex; align-items: center; gap: 8px; padding: 11px 14px;
         background: var(--surface-2); border-bottom: 1px solid var(--line);
       }
-      .msg-head b { flex: 1; }
-      .msg-head .n { color: var(--ink-soft); font-size: .88rem; font-weight: 600; }
+      .msg-head b { flex: 1; font-weight: 600; }
+      .msg-head .n { color: var(--ink-soft); font-size: .88rem; font-weight: 500; }
       .sent-tag { display: none; font-size: .78rem; font-weight: 800; color: var(--green-dark); letter-spacing: .03em; }
+      @media (prefers-color-scheme: dark) { .sent-tag { color: var(--green-neon); } }
       .msg.sent .sent-tag { display: inline; }
       .msg pre {
-        margin: 0; padding: 12px; font: inherit; font-size: .97rem; white-space: pre-wrap;
+        margin: 0; padding: 12px 14px; font: inherit; font-size: .97rem; white-space: pre-wrap;
         word-break: break-word; max-height: 260px; overflow: auto;
       }
-      .msg-foot { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
+      .msg-foot { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
       .steps { margin: 0 0 12px; padding-left: 20px; color: var(--ink-soft); font-size: .95rem; }
       .steps li { margin-bottom: 3px; }
 
       /* ---------- Cadangan ---------- */
-      .backup-btns { display: grid; gap: 8px; }
-      .backup-btns .btn { width: 100%; min-height: 46px; }
+      .backup-btns { display: grid; gap: 10px; }
+      .backup-btns .btn { width: 100%; min-height: 48px; }
       .howto { margin: 0; padding-left: 20px; font-size: .95rem; }
       .howto li { margin-bottom: 6px; }
       .install-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-      .install-head img { border-radius: 14px; border: 1px solid var(--line); background: #fff; flex: none; }
+      .install-head img { border-radius: 16px; background: #fff; flex: none; box-shadow: var(--shadow-sm); }
       .install-head p { margin: 0; color: var(--ink-soft); font-size: .92rem; }
 
       .toast {
-        position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(20px);
+        position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
         background: var(--ink); color: var(--bg); padding: 11px 18px; border-radius: 999px;
         font-weight: 600; font-size: .95rem; opacity: 0; pointer-events: none;
         transition: opacity .2s, transform .2s; z-index: 50; max-width: 88vw; text-align: center;
         box-shadow: 0 6px 20px rgba(0,0,0,.25);
       }
       .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-      .foot-note { text-align: center; color: var(--ink-soft); font-size: .85rem; margin-top: 22px; }
+      .foot-note { text-align: center; color: var(--ink-soft); font-size: .85rem; margin-top: 22px; flex: none; order: 98; }
+
+      /* ---------- Latar kustom ---------- */
+      #bg-layer {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        background-size: cover; background-position: center; background-repeat: no-repeat;
+        opacity: 0; transition: opacity .25s ease;
+      }
+      #bg-scrim {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        background: var(--bg); opacity: 0; transition: opacity .25s ease;
+      }
+      #app-view { position: relative; z-index: 1; }
+      body.has-bg .topbar {
+        background: color-mix(in srgb, var(--bg) 78%, transparent);
+        backdrop-filter: blur(12px) saturate(1.2); -webkit-backdrop-filter: blur(12px) saturate(1.2);
+        border-radius: 0 0 20px 20px; padding-left: 12px; padding-right: 12px; margin: 0 -4px;
+        border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+      }
+      body.has-bg .card {
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      }
+      body.has-bg .searchbox input[type="search"] {
+        background: color-mix(in srgb, var(--surface-2) 92%, transparent);
+      }
+      .bg-preview {
+        width: 100%; height: 150px; border-radius: 16px; overflow: hidden; position: relative;
+        background: var(--surface-2); border: 1.5px dashed var(--line);
+        display: flex; align-items: center; justify-content: center; color: var(--ink-soft);
+        font-size: .9rem; font-weight: 600; text-align: center; padding: 12px;
+      }
+      .bg-preview.has-img { border-style: solid; border-color: transparent; }
+      .bg-preview img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+      .bg-preview .bg-preview-label {
+        position: relative; z-index: 1; background: rgba(5,8,7,.72); color: #fff;
+        padding: 6px 12px; border-radius: 999px; font-size: .78rem; font-weight: 700; letter-spacing: .02em;
+      }
+      .bg-controls { margin-top: 14px; display: grid; gap: 14px; }
+      .bg-intensity-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+      .bg-intensity-head label { font-weight: 700; font-size: .95rem; }
+      .bg-intensity-val {
+        font-weight: 800; font-size: .9rem; background: var(--obsidian); color: var(--green-neon);
+        padding: 4px 12px; border-radius: 999px; min-width: 62px; text-align: center;
+      }
+      .bg-range-wrap { display: flex; align-items: center; gap: 10px; }
+      .bg-range-wrap span { font-size: .78rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+      input[type="range"].bg-range {
+        -webkit-appearance: none; appearance: none; flex: 1; width: 100%; height: 10px; border-radius: 999px;
+        background: linear-gradient(90deg, #d9e2dc 0%, #00ff7a var(--fill,45%), #00c853 var(--fill,45%));
+        outline: none; min-height: 32px; background-color: transparent; cursor: pointer;
+      }
+      @media (prefers-color-scheme: dark) {
+        input[type="range"].bg-range { background: linear-gradient(90deg, #223028 0%, #00ff7a var(--fill,45%), #00c853 var(--fill,45%)); }
+      }
+      input[type="range"].bg-range::-webkit-slider-thumb {
+        -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%;
+        background: #03130a; border: 3px solid var(--green-neon);
+        box-shadow: 0 0 0 4px rgba(0,255,122,.22), 0 6px 16px rgba(0,0,0,.35); cursor: pointer;
+      }
+      input[type="range"].bg-range::-moz-range-thumb {
+        width: 26px; height: 26px; border-radius: 50%; background: #03130a; border: 3px solid var(--green-neon);
+        box-shadow: 0 0 0 4px rgba(0,255,122,.22), 0 6px 16px rgba(0,0,0,.35); cursor: pointer;
+      }
+      input[type="range"].bg-range:disabled { opacity: .45; cursor: default; }
+      input[type="range"].bg-range:disabled::-webkit-slider-thumb { border-color: var(--line); box-shadow: none; }
+      .bg-presets { display: flex; gap: 8px; flex-wrap: wrap; }
+      .bg-presets .fchip { min-height: 36px; padding: 6px 14px; font-size: .85rem; }
+      .bg-presets .fchip.active { background: var(--obsidian); color: var(--green-neon); border-color: var(--obsidian); }
+      .bg-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .bg-actions .btn { width: 100%; min-height: 48px; }
+      .bg-actions .btn.danger { color: var(--red-dark); border-color: #ffb3c0; }
+      @media (prefers-color-scheme: dark) { .bg-actions .btn.danger { color: #ff7a90; border-color: #5c1a28; } }
+      @media (max-width: 420px) { .bg-actions { grid-template-columns: 1fr; } }
+      html[data-hatch-view="widget"] #bg-layer, html[data-hatch-view="widget"] #bg-scrim { display: none !important; }
 
       /* ---------- Widget ---------- */
       #widget-view { display: none; }
@@ -284,23 +438,34 @@
         min-height: 100vh; padding: 14px; color: var(--ink);
       }
       html[data-hatch-view="widget"] body { background: transparent; }
-      .w-title { font-weight: 800; font-size: .95rem; }
+      .w-title { font-weight: 700; font-size: .95rem; }
       .w-date { color: var(--ink-soft); font-size: .8rem; }
       .w-row { display: flex; gap: 12px; margin-top: 4px; }
       .w-stat { min-width: 0; }
       .w-stat b { display: block; font-size: 1.7rem; line-height: 1.05; }
+      /* Widget transparan: warna harus terbaca di permukaan terang & gelap host */
+      #w-ready { color: #007a2e; }
+      #w-kosong { color: #d6002b; }
+      @media (prefers-color-scheme: dark) {
+        #w-ready { color: #00ff7a; }
+        #w-kosong { color: #ff5c78; }
+      }
       .w-stat span { font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); }
       html[data-hatch-size="small"] #widget-view { padding: 10px; gap: 4px; }
       html[data-hatch-size="small"] .w-title { font-size: .85rem; }
       html[data-hatch-size="small"] .w-date { font-size: .7rem; }
-      html[data-hatch-size="small"] .w-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; width: 100%; }
+      html[data-hatch-size="small"] .w-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; }
       html[data-hatch-size="small"] .w-stat b { font-size: 1.25rem; }
       html[data-hatch-size="small"] .w-stat span { font-size: .58rem; letter-spacing: .01em; }
       html[data-hatch-target="tv"] .wrap { max-width: 1100px; }
       html[data-hatch-target="tv"] .brand h1 { font-size: 1.8rem; }
+      html[data-hatch-target="tv"] .tabs { width: min(1100px, 100%); }
+      html[data-hatch-target="tv"] #list { display: flex; flex-direction: column; }
     </style>
   </head>
   <body>
+    <div id="bg-scrim" aria-hidden="true"></div>
+    <div id="bg-layer" aria-hidden="true"></div>
     <!-- ================= APP ================= -->
     <div id="app-view">
       <div class="wrap">
@@ -312,10 +477,14 @@
               <div class="date" id="today-label">—</div>
             </div>
           </div>
-          <div class="counts" role="status" aria-label="Ringkasan stok hari ini">
-            <div class="count ready"><b id="c-ready">0</b><span>Ready</span></div>
-            <div class="count kosong"><b id="c-kosong">0</b><span>Kosong</span></div>
-            <div class="count restok"><b id="c-restok">0</b><span>Restok</span></div>
+          <div class="summary" role="status" aria-label="Ringkasan stok hari ini">
+            <div class="summary-top">
+              <div class="stat"><b id="c-ready">0</b><span>Ready</span><small>Siap dijual</small></div>
+              <div class="divider" aria-hidden="true"></div>
+              <div class="stat"><b id="c-kosong">0</b><span>Kosong</span><small>Habis / belum ada</small></div>
+            </div>
+            <div class="stock-bar" aria-hidden="true"><div class="bar-ready" id="bar-ready" style="width:50%"></div><div class="bar-kosong" id="bar-kosong" style="width:50%"></div></div>
+            <div class="stock-bar-label"><span id="bar-ready-label">Ready 0%</span><span id="bar-kosong-label">Kosong 0%</span></div>
           </div>
           <div class="actions">
             <button class="btn undo" id="btn-undo" type="button">↩ Undo</button>
@@ -336,23 +505,25 @@
         </div>
 
         <nav class="tabs" aria-label="Menu">
-          <button class="tab active" type="button" data-tab="daftar">Daftar Barang</button>
-          <button class="tab" type="button" data-tab="input">Input Hari Ini</button>
-          <button class="tab" type="button" data-tab="kirim">Kirim WA</button>
-          <button class="tab" type="button" data-tab="histori">Histori</button>
-          <button class="tab" type="button" data-tab="cadangan">Cadangan</button>
+          <button class="tab active" type="button" data-tab="daftar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></svg>Daftar</button>
+          <button class="tab" type="button" data-tab="input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M9.2 16.8l.7-2.7 5-5 2 2-5 5-2.7.7z"/></svg>Input</button>
+          <button class="tab" type="button" data-tab="kirim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 21l2-5.6A8.5 8.5 0 1 1 21 11.5z"/></svg>Kirim WA</button>
+          <button class="tab" type="button" data-tab="histori"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 8.5A8.5 8.5 0 1 1 3.6 13"/><path d="M4 4v4.5h4.5"/><path d="M12 8v4.2l3 1.8"/></svg>Histori</button>
+          <button class="tab" type="button" data-tab="cadangan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5h16l-1.4 11a2 2 0 0 1-2 1.7H7.4a2 2 0 0 1-2-1.7L4 8.5z"/><path d="M3 4h18v4.5H3z"/><path d="M10 13h4"/></svg>Cadangan</button>
         </nav>
 
         <!-- ===== Daftar Barang ===== -->
         <section class="panel active" id="panel-daftar">
           <div class="searchrow">
-            <input type="search" id="search" placeholder="Cari barang… (mis. cabe, sawi, telur)" aria-label="Cari barang" />
+            <div class="searchbox">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16.7 16.7"/></svg>
+              <input type="search" id="search" placeholder="Cari barang… (mis. cabe, sawi, telur)" aria-label="Cari barang" />
+            </div>
           </div>
           <div class="filters" role="group" aria-label="Filter status">
             <button class="fchip active" type="button" data-filter="ALL">Semua</button>
             <button class="fchip" type="button" data-filter="R">Ready</button>
             <button class="fchip" type="button" data-filter="K">Kosong</button>
-            <button class="fchip" type="button" data-filter="S">Restok</button>
           </div>
           <div id="list"></div>
           <div class="empty-note" id="list-empty" hidden>Tidak ada barang yang cocok dengan pencarian / filter ini.</div>
@@ -361,20 +532,15 @@
         <!-- ===== Input Hari Ini ===== -->
         <section class="panel" id="panel-input">
           <div class="card">
-            <h2>❌ Kosong Hari Ini</h2>
+            <h2>Kosong Hari Ini</h2>
             <p class="hint">Centang barang yang hari ini kosong, lalu tekan Terapkan di bawah.</p>
             <div class="searchrow" style="margin-bottom:10px">
-              <input type="search" id="search-kosong" placeholder="Cari barang kosong…" aria-label="Cari barang untuk daftar kosong" />
+              <div class="searchbox">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16.7 16.7"/></svg>
+                <input type="search" id="search-kosong" placeholder="Cari barang kosong…" aria-label="Cari barang untuk daftar kosong" />
+              </div>
             </div>
             <div class="pick-list" id="pick-kosong"></div>
-          </div>
-          <div class="card">
-            <h2>🔄 Restok Hari Ini</h2>
-            <p class="hint">Centang barang yang hari ini restok, lalu tekan Terapkan di bawah.</p>
-            <div class="searchrow" style="margin-bottom:10px">
-              <input type="search" id="search-restok" placeholder="Cari barang restok…" aria-label="Cari barang untuk daftar restok" />
-            </div>
-            <div class="pick-list" id="pick-restok"></div>
           </div>
           <div class="card">
             <div class="applybar" style="margin-top:0">
@@ -420,43 +586,58 @@
 
         <!-- ===== Cadangan ===== -->
         <section class="panel" id="panel-cadangan">
-          <div class="card">
-            <h2>Pintasan di Layar Utama</h2>
-            <div class="install-head">
-              <img src="data:image/png;base64,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" alt="Ikon pintasan Kinmart" width="64" height="64" />
-              <p>Ini ikon yang muncul di layar utama HP setelah pintasan dipasang — logo K Kinmart, bukan ikon generik Chrome.</p>
+          <div class="card" id="card-latar">
+            <h2>Latar Belakang</h2>
+            <p class="hint">Ganti latar aplikasi dengan gambar pilihanmu sendiri — foto toko, sayuran, atau gambar apa pun dari galeri HP. Atur intensitasnya: makin tinggi, makin jelas gambarnya; makin rendah, makin lembut supaya tulisan tetap gampang dibaca.</p>
+            <div class="bg-preview" id="bg-preview">
+              <span id="bg-preview-empty">Belum ada gambar latar<br /><small style="font-weight:500">Tekan “Pilih Gambar” untuk mulai</small></span>
+              <img id="bg-preview-img" alt="Pratinjau gambar latar" hidden />
+              <span class="bg-preview-label" id="bg-preview-label" hidden>Pratinjau latar</span>
             </div>
-            <ol class="howto">
-              <li>Buka alamat ini di <b>Chrome</b> HP kamu: <a href="https://candra304.github.io/stok-harian-kinmart/" target="_blank" rel="noopener"><b>candra304.github.io/stok-harian-kinmart</b></a></li>
-              <li>Tap titik tiga (⋮) di pojok kanan atas Chrome.</li>
-              <li>Pilih <b>Tambahkan ke Layar utama</b> (di sebagian HP: <b>Instal aplikasi</b>), lalu tap <b>Tambah / Instal</b>.</li>
-              <li>Selesai — buka stok harian dari ikon K Kinmart di layar utama, seperti aplikasi biasa.</li>
-            </ol>
-            <p class="hint" style="margin:10px 0 0">Kalau pintasan lama berikon huruf G sudah terlanjur terpasang, <b>hapus dulu pintasan lamanya</b>, tutup Chrome, lalu pasang ulang dari alamat di atas — ikon G itu cache pintasan lama dan tidak berubah sendiri.</p>
+            <div class="bg-controls">
+              <div>
+                <div class="bg-intensity-head">
+                  <label for="bg-intensity">Intensitas Latar</label>
+                  <span class="bg-intensity-val" id="bg-intensity-val">45%</span>
+                </div>
+                <div class="bg-range-wrap">
+                  <span>Lembut</span>
+                  <input type="range" class="bg-range" id="bg-intensity" min="0" max="100" step="1" value="45" aria-label="Intensitas gambar latar, 0 sampai 100 persen" />
+                  <span>Jelas</span>
+                </div>
+                <div class="bg-presets" role="group" aria-label="Pilihan cepat intensitas" style="margin-top:10px">
+                  <button class="fchip" type="button" data-bg-preset="20">Lembut 20%</button>
+                  <button class="fchip" type="button" data-bg-preset="45">Sedang 45%</button>
+                  <button class="fchip" type="button" data-bg-preset="70">Kuat 70%</button>
+                  <button class="fchip" type="button" data-bg-preset="100">Penuh 100%</button>
+                </div>
+                <p class="hint" style="margin:8px 0 0">Geser untuk pratinjau langsung — latar berubah saat itu juga di semua tab. Pengaturan ini tersimpan otomatis di HP ini dan ikut ter-export di backup.</p>
+              </div>
+              <div class="bg-actions">
+                <label class="btn primary" for="bg-file" style="margin:0">Pilih Gambar</label>
+                <input type="file" id="bg-file" accept="image/*" hidden />
+                <button class="btn danger" id="btn-bg-remove" type="button">Hapus Latar</button>
+              </div>
+            </div>
           </div>
           <div class="card">
-            <h2>Export Data ke HP / Google Drive</h2>
-            <p class="hint">Export data stok supaya aman di luar aplikasi ini. Ke HP: file langsung terunduh. Ke Drive: menu bagikan HP terbuka, lalu pilih <b>Drive → Simpan ke Drive</b>.</p>
+            <h2>Export ke Drive</h2>
+            <p class="hint">Simpan backup data stok semua tanggal ke Google Drive. Menu bagikan HP terbuka — pilih <b>Drive → Simpan ke Drive</b>. Kalau menu bagikan tidak muncul di HP kamu, file backup otomatis terunduh ke HP dan bisa di-upload lewat aplikasi Drive.</p>
             <div class="backup-btns">
-              <button class="btn primary" id="btn-export-hp" type="button">⬇ Export ke HP (File Backup JSON)</button>
-              <button class="btn" id="btn-export-drive" type="button">☁ Export ke Google Drive</button>
-              <button class="btn" id="btn-export-txt" type="button">📄 Export Laporan Hari Ini (TXT)</button>
-              <a class="btn" href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener" style="text-decoration:none">Buka Google Drive</a>
+              <button class="btn primary" id="btn-export-drive" type="button">Export ke Drive</button>
             </div>
-            <p class="hint" style="margin:10px 0 0">Kalau menu bagikan tidak muncul di HP kamu, file-nya otomatis terunduh dulu — tinggal upload file itu lewat aplikasi Google Drive atau tombol <b>Buka Google Drive</b> di atas. Laporan TXT berisi daftar Ready, Kosong, dan Restok hari ini, enak dibaca / diteruskan.</p>
           </div>
           <div class="card">
-            <h2>Backup Data Stok</h2>
-            <p class="hint">Export untuk menyimpan data stok semua tanggal ke satu file. Import untuk mengembalikannya, misalnya setelah ganti HP.</p>
+            <h2>Import dari Drive</h2>
+            <p class="hint">Kembalikan data stok dari file backup, misalnya setelah ganti HP. Pilih file backup-nya dari Google Drive atau penyimpanan HP — data yang tersimpan sekarang akan diganti dengan isi file itu.</p>
             <div class="backup-btns">
-              <button class="btn" id="btn-export" type="button">⬇ Export Data (JSON)</button>
-              <label class="btn" for="import-file" style="margin:0">⬆ Import Data (JSON)</label>
+              <label class="btn" for="import-file" style="margin:0">Import dari Drive</label>
               <input type="file" id="import-file" accept="application/json,.json" hidden />
             </div>
           </div>
         </section>
 
-        <p class="foot-note">94 barang baku Kinmart · Status awal: Ready 33 · Kosong 28 · Restok 33</p>
+        <p class="foot-note">94 barang baku Kinmart · Status awal: Ready 66 · Kosong 28</p>
       </div>
     </div>
 
@@ -465,9 +646,8 @@
       <div class="w-title">Stok Kinmart</div>
       <div class="w-date" id="w-date">—</div>
       <div class="w-row">
-        <div class="w-stat"><b id="w-ready" style="color:var(--green)">0</b><span>Ready</span></div>
-        <div class="w-stat"><b id="w-kosong" style="color:var(--red)">0</b><span>Kosong</span></div>
-        <div class="w-stat"><b id="w-restok" style="color:var(--amber)">0</b><span>Restok</span></div>
+        <div class="w-stat"><b id="w-ready">0</b><span>Ready</span></div>
+        <div class="w-stat"><b id="w-kosong">0</b><span>Kosong</span></div>
       </div>
     </section>
 
@@ -477,7 +657,7 @@
     (function () {
       "use strict";
 
-      /* ===== Data baku: [nama, status awal] R=Ready K=Kosong S=Restok ===== */
+      /* ===== Data baku: [nama, status awal] R=Ready K=Kosong (kode lama S dibaca sebagai Ready) ===== */
       var RAW = [
         ["Apel Fuji","K"],["Bawang merah kupas","R"],["Bawang putih kupas","R"],
         ["Bayam","K"],["Bayam baby","K"],["Bayam besar","K"],["Belimbing wuluh","K"],
@@ -506,8 +686,8 @@
       ];
       var NAMES = RAW.map(function (r) { return r[0]; });
       var INITIAL = {};
-      RAW.forEach(function (r) { INITIAL[r[0]] = r[1]; });
-      var LABEL = { R: "Ready", K: "Kosong", S: "Restok" };
+      RAW.forEach(function (r) { INITIAL[r[0]] = r[1] === "K" ? "K" : "R"; });
+      var LABEL = { R: "Ready", K: "Kosong" };
       var STORE_KEY = "kinmart-mandiri-v1";
 
       /* ===== Tanggal (lokal) ===== */
@@ -535,7 +715,14 @@
       }
 
       /* ===== Penyimpanan lokal (di HP ini) ===== */
-      var store = { days: {}, wa: "" };
+      var DEFAULT_BG_INTENSITY = 45;
+      function normBg(raw) {
+        var img = (raw && typeof raw.img === "string" && raw.img.indexOf("data:image/") === 0) ? raw.img : "";
+        var inten = (raw && typeof raw.intensity === "number" && isFinite(raw.intensity)) ? Math.round(raw.intensity) : DEFAULT_BG_INTENSITY;
+        if (inten < 0) inten = 0; if (inten > 100) inten = 100;
+        return { img: img, intensity: inten };
+      }
+      var store = { days: {}, wa: "", bg: { img: "", intensity: DEFAULT_BG_INTENSITY } };
       var storageOK = true;
       try {
         var saved = localStorage.getItem(STORE_KEY);
@@ -544,6 +731,7 @@
           if (parsed && typeof parsed === "object") {
             store.days = parsed.days || {};
             store.wa = parsed.wa || "";
+            store.bg = normBg(parsed.bg);
           }
         }
       } catch (e) { storageOK = false; }
@@ -560,6 +748,62 @@
           if (localStorage.getItem(STORE_KEY) !== raw) throw new Error("verify");
         } catch (e) { storageOK = false; showStorageWarning(); }
       }
+      function persistBgOnly() {
+        /* Simpan latar tanpa menimpa status hari ini; gagal kuota tidak mematikan penyimpanan stok. */
+        try {
+          var raw = JSON.stringify(store);
+          localStorage.setItem(STORE_KEY, raw);
+          return localStorage.getItem(STORE_KEY) === raw;
+        } catch (e) { return false; }
+      }
+
+      /* ===== Latar kustom: gambar + intensitas ===== */
+      function applyBg() {
+        var bg = normBg(store.bg);
+        store.bg = bg;
+        var layer = document.getElementById("bg-layer");
+        var scrim = document.getElementById("bg-scrim");
+        var has = !!bg.img;
+        document.body.classList.toggle("has-bg", has);
+        if (layer) {
+          layer.style.backgroundImage = has ? 'url("' + bg.img + '")' : "none";
+          layer.style.opacity = has ? String(bg.intensity / 100) : "0";
+        }
+        if (scrim) {
+          /* Lapisan dasar di bawah gambar: makin rendah intensitas, makin dominan warna dasar elit. */
+          scrim.style.opacity = has ? String(1 - (bg.intensity / 100)) : "0";
+          scrim.style.background = "var(--bg)";
+        }
+        var slider = document.getElementById("bg-intensity");
+        var val = document.getElementById("bg-intensity-val");
+        if (slider) {
+          slider.value = String(bg.intensity);
+          slider.style.setProperty("--fill", bg.intensity + "%");
+          slider.disabled = false;
+        }
+        if (val) val.textContent = bg.intensity + "%";
+        document.querySelectorAll("[data-bg-preset]").forEach(function (b) {
+          b.classList.toggle("active", Number(b.getAttribute("data-bg-preset")) === bg.intensity);
+        });
+        var prevWrap = document.getElementById("bg-preview");
+        var prevImg = document.getElementById("bg-preview-img");
+        var prevEmpty = document.getElementById("bg-preview-empty");
+        var prevLabel = document.getElementById("bg-preview-label");
+        var removeBtn = document.getElementById("btn-bg-remove");
+        if (prevWrap) prevWrap.classList.toggle("has-img", has);
+        if (prevImg) { prevImg.hidden = !has; if (has) prevImg.src = bg.img; else prevImg.removeAttribute("src"); }
+        if (prevEmpty) prevEmpty.hidden = has;
+        if (prevLabel) prevLabel.hidden = !has;
+        if (removeBtn) removeBtn.disabled = !has;
+      }
+      function setBgIntensity(v, save) {
+        var n = Math.round(Number(v));
+        if (!isFinite(n)) n = DEFAULT_BG_INTENSITY;
+        if (n < 0) n = 0; if (n > 100) n = 100;
+        store.bg = normBg({ img: store.bg ? store.bg.img : "", intensity: n });
+        applyBg();
+        if (save) persistBgOnly();
+      }
 
       /* Format simpan per tanggal: { s: {nama: status}, u: waktu simpan }.
          Format lama (objek status langsung) tetap dibaca apa adanya. */
@@ -574,7 +818,8 @@
         var out = {};
         NAMES.forEach(function (n) {
           var v = obj && obj[n];
-          out[n] = (v === "R" || v === "K" || v === "S") ? v : INITIAL[n];
+          /* Data lama berstatus Restok (S) otomatis dibaca sebagai Ready. */
+          out[n] = (v === "R" || v === "S") ? "R" : (v === "K" ? "K" : INITIAL[n]);
         });
         return out;
       }
@@ -616,7 +861,7 @@
         undoStack = [];
         syncUndoBtn();
         sentFlags = [false, false, false];
-        pickK = {}; pickS = {};
+        pickK = {};
         syncHeader();
         syncSavedLabel();
         refresh();
@@ -637,6 +882,9 @@
 
       /* ===== Elemen ===== */
       function el(id) { return document.getElementById(id); }
+      /* Catatan kaki dipindah ke akhir panel Daftar agar ikut scroll bersama daftar. */
+      var footNote = document.querySelector(".foot-note");
+      if (footNote && el("panel-daftar")) el("panel-daftar").appendChild(footNote);
       var listEl = el("list"), toastEl = el("toast"), toastTimer = null;
       function toast(msg) {
         toastEl.textContent = msg;
@@ -645,8 +893,8 @@
         toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
       }
       function counts() {
-        var c = { R: 0, K: 0, S: 0 };
-        NAMES.forEach(function (n) { c[state[n]]++; });
+        var c = { R: 0, K: 0 };
+        NAMES.forEach(function (n) { c[state[n] === "K" ? "K" : "R"]++; });
         return c;
       }
 
@@ -660,13 +908,13 @@
           if (filter !== "ALL" && st !== filter) return;
           if (q && n.toLowerCase().indexOf(q) === -1) return;
           shown++;
-          html += '<div class="item">'
-            + '<div class="item-head"><span class="item-name">' + n + '</span>'
+          html += '<div class="item ' + st + '">'
+            + '<div class="tile ' + st + '"><span class="mono" aria-hidden="true">' + n.charAt(0) + '</span></div>'
+            + '<div class="item-main"><div class="item-name">' + n + '</div>'
             + '<span class="pill ' + st + '">' + LABEL[st] + '</span></div>'
             + '<div class="seg" role="group" aria-label="Status ' + n + '">'
-            + '<button type="button" data-name="' + n + '" data-set="R" class="' + (st === "R" ? "on-R" : "") + '">READY</button>'
-            + '<button type="button" data-name="' + n + '" data-set="K" class="' + (st === "K" ? "on-K" : "") + '">KOSONG</button>'
-            + '<button type="button" data-name="' + n + '" data-set="S" class="' + (st === "S" ? "on-S" : "") + '">RESTOK</button>'
+            + '<button type="button" data-name="' + n + '" data-set="R" class="' + (st === "R" ? "on-R" : "") + '">Ready</button>'
+            + '<button type="button" data-name="' + n + '" data-set="K" class="' + (st === "K" ? "on-K" : "") + '">Kosong</button>'
             + '</div></div>';
         });
         listEl.innerHTML = html;
@@ -685,10 +933,9 @@
       });
 
       /* ===== Render daftar centang Input Hari Ini ===== */
-      var pickK = {}, pickS = {};
+      var pickK = {};
       function renderPicks() {
         buildPickList(el("pick-kosong"), el("search-kosong").value, pickK, "K");
-        buildPickList(el("pick-restok"), el("search-restok").value, pickS, "S");
         syncApply();
       }
       function buildPickList(container, qv, picks, target) {
@@ -705,46 +952,41 @@
       function onPickChange(ev) {
         var cb = ev.target;
         if (!cb.matches || !cb.matches("input[data-pick]")) return;
-        var target = cb.getAttribute("data-pick"), n = cb.value;
-        if (target === "K") { pickK[n] = cb.checked; if (cb.checked) delete pickS[n]; }
-        else { pickS[n] = cb.checked; if (cb.checked) delete pickK[n]; }
+        var n = cb.value;
+        pickK[n] = cb.checked;
         renderPicks();
       }
       el("pick-kosong").addEventListener("change", onPickChange);
-      el("pick-restok").addEventListener("change", onPickChange);
       el("search-kosong").addEventListener("input", renderPicks);
-      el("search-restok").addEventListener("input", renderPicks);
       function pickCount() {
         var a = Object.keys(pickK).filter(function (k) { return pickK[k]; }).length;
-        var b = Object.keys(pickS).filter(function (k) { return pickS[k]; }).length;
-        return { k: a, s: b, total: a + b };
+        return { k: a, total: a };
       }
       function syncApply() {
         var pc = pickCount();
         el("btn-apply").disabled = pc.total === 0;
         el("sel-info").textContent = pc.total === 0
           ? "Belum ada centangan baru."
-          : "Terpilih: " + pc.k + " kosong, " + pc.s + " restok.";
+          : "Terpilih: " + pc.k + " barang kosong.";
       }
       el("btn-clear-pick").addEventListener("click", function () {
-        pickK = {}; pickS = {}; renderPicks();
+        pickK = {}; renderPicks();
       });
       el("btn-apply").addEventListener("click", function () {
         var pc = pickCount();
         if (pc.total === 0) return;
         pushUndo();
         Object.keys(pickK).forEach(function (n) { if (pickK[n]) state[n] = "K"; });
-        Object.keys(pickS).forEach(function (n) { if (pickS[n]) state[n] = "S"; });
-        pickK = {}; pickS = {};
+        pickK = {};
         saveDay();
         refresh();
-        toast("Input hari ini diterapkan: " + pc.k + " kosong, " + pc.s + " restok.");
+        toast("Input hari ini diterapkan: " + pc.k + " barang kosong.");
       });
 
-      /* ===== Kirim WA: gabungan Ready+Restok, abjad A–Z, tepat 3 pesan ===== */
+      /* ===== Kirim WA: daftar Ready saja, abjad A–Z, tepat 3 pesan ===== */
       var sentFlags = [false, false, false];
       function sendList() {
-        return NAMES.filter(function (n) { return state[n] === "R" || state[n] === "S"; })
+        return NAMES.filter(function (n) { return state[n] === "R"; })
           .sort(function (a, b) { return a.localeCompare(b, "id"); });
       }
       function split3(arr) {
@@ -770,8 +1012,7 @@
         var c = counts();
         el("send-summary").innerHTML =
           (followingToday ? "" : "<b>Data tanggal " + fmtDate(viewDate) + "</b> — ")
-          + "Yang dikirim: <b>" + list.length + " barang</b> (Ready " + c.R + " + Restok " + c.S +
-          "), digabung &amp; diurutkan abjad A–Z, dibagi 3 pesan. Barang Kosong (" + c.K + ") tidak dikirim.";
+          + "Yang dikirim: <b>" + list.length + " barang Ready</b>, diurutkan abjad A–Z, dibagi 3 pesan. Barang Kosong (" + c.K + ") tidak dikirim.";
         var html = "";
         groups.forEach(function (g, i) {
           var text = g.join("\n");
@@ -895,13 +1136,13 @@
         var html = "";
         keys.forEach(function (k) {
           var st = validStatuses(dayStatuses(store.days[k]));
-          var c = { R: 0, K: 0, S: 0 };
-          NAMES.forEach(function (n) { c[st[n]]++; });
+          var c = { R: 0, K: 0 };
+          NAMES.forEach(function (n) { c[st[n] === "K" ? "K" : "R"]++; });
           var u = dayUpdated(store.days[k]);
           var when = u ? " · disimpan " + new Date(u).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "";
           html += '<div class="hist-item"><div class="hist-main"><b>' + fmtDate(k) + '</b>'
             + (k === todayKey() ? ' <span class="hist-today">HARI INI</span>' : '')
-            + '<div class="hist-sub">Ready ' + c.R + ' · Kosong ' + c.K + ' · Restok ' + c.S + when + '</div></div>'
+            + '<div class="hist-sub">Ready ' + c.R + ' · Kosong ' + c.K + when + '</div></div>'
             + '<button class="btn" type="button" data-open-date="' + k + '">Buka</button>'
             + '<button class="btn hist-del" type="button" data-del-date="' + k + '">Hapus</button></div>';
         });
@@ -914,6 +1155,7 @@
           var k = open.getAttribute("data-open-date");
           loadDate(k, k === todayKey());
           activateTab("daftar");
+          var pd = el("panel-daftar"); if (pd) pd.scrollTop = 0;
           window.scrollTo({ top: 0 });
           toast("Data " + fmtDate(k) + " dibuka — silakan edit.");
           return;
@@ -964,14 +1206,106 @@
         });
       });
       el("search").addEventListener("input", function () { query = this.value; renderList(); });
-      document.querySelectorAll(".fchip").forEach(function (ch) {
+      document.querySelectorAll(".filters .fchip").forEach(function (ch) {
         ch.addEventListener("click", function () {
-          document.querySelectorAll(".fchip").forEach(function (x) { x.classList.remove("active"); });
+          document.querySelectorAll(".filters .fchip").forEach(function (x) { x.classList.remove("active"); });
           ch.classList.add("active");
           filter = ch.getAttribute("data-filter");
           renderList();
         });
       });
+
+      /* ===== Latar: slider, preset, pilih & hapus gambar ===== */
+      (function initBgControls() {
+        var slider = el("bg-intensity");
+        if (slider) {
+          slider.addEventListener("input", function () { setBgIntensity(this.value, false); });
+          slider.addEventListener("change", function () {
+            setBgIntensity(this.value, true);
+            toast("Intensitas latar diatur ke " + store.bg.intensity + "%.");
+          });
+        }
+        document.querySelectorAll("[data-bg-preset]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            setBgIntensity(b.getAttribute("data-bg-preset"), true);
+            toast(store.bg && store.bg.img
+              ? "Intensitas latar diatur ke " + store.bg.intensity + "%."
+              : "Intensitas disimpan di " + store.bg.intensity + "% — akan langsung terpakai saat kamu memilih gambar.");
+          });
+        });
+        var removeBtn = el("btn-bg-remove");
+        if (removeBtn) {
+          var armed = false, timer = null;
+          removeBtn.addEventListener("click", function () {
+            if (!store.bg || !store.bg.img) return;
+            if (!armed) {
+              armed = true;
+              removeBtn.textContent = "Yakin Hapus? Tekan Lagi";
+              removeBtn.classList.add("armed");
+              timer = setTimeout(function () { armed = false; removeBtn.textContent = "Hapus Latar"; removeBtn.classList.remove("armed"); }, 3200);
+              return;
+            }
+            clearTimeout(timer); armed = false;
+            removeBtn.textContent = "Hapus Latar"; removeBtn.classList.remove("armed");
+            store.bg = { img: "", intensity: DEFAULT_BG_INTENSITY };
+            applyBg();
+            if (!persistBgOnly()) toast("Latar dihapus di tampilan ini, tapi penyimpanan HP penuh — latar bisa muncul lagi saat dibuka ulang.");
+            else toast("Latar dihapus — kembali ke latar bawaan.");
+          });
+        }
+        var fileInput = el("bg-file");
+        if (fileInput) {
+          fileInput.addEventListener("change", function () {
+            var f = this.files && this.files[0];
+            this.value = "";
+            if (!f) return;
+            if (!/^image\//.test(f.type || "")) { toast("File itu bukan gambar — pilih file gambar dari galeri."); return; }
+            if (f.size > 12 * 1024 * 1024) { toast("Gambar terlalu besar (maks 12 MB) — pilih gambar yang lebih kecil."); return; }
+            var reader = new FileReader();
+            reader.onload = function () {
+              var img = new Image();
+              img.onload = function () {
+                try {
+                  var maxDim = 1280;
+                  var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+                  var scale = Math.min(1, maxDim / Math.max(w, h));
+                  var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+                  var canvas = document.createElement("canvas");
+                  canvas.width = cw; canvas.height = ch;
+                  var ctx = canvas.getContext("2d");
+                  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, cw, ch);
+                  ctx.drawImage(img, 0, 0, cw, ch);
+                  var dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+                  /* Kalau masih terlalu besar untuk penyimpanan HP, perkecil lagi. */
+                  if (dataUrl.length > 1800000) {
+                    var c2 = document.createElement("canvas");
+                    var s2 = 800 / Math.max(cw, ch);
+                    c2.width = Math.max(1, Math.round(cw * s2)); c2.height = Math.max(1, Math.round(ch * s2));
+                    var ctx2 = c2.getContext("2d");
+                    ctx2.fillStyle = "#ffffff"; ctx2.fillRect(0, 0, c2.width, c2.height);
+                    ctx2.drawImage(img, 0, 0, c2.width, c2.height);
+                    dataUrl = c2.toDataURL("image/jpeg", 0.72);
+                  }
+                  var keepIntensity = (store.bg && typeof store.bg.intensity === "number") ? store.bg.intensity : DEFAULT_BG_INTENSITY;
+                  /* Gambar baru mulai dari intensitas sedang kalau sebelumnya 0. */
+                  if (keepIntensity === 0) keepIntensity = DEFAULT_BG_INTENSITY;
+                  store.bg = { img: dataUrl, intensity: keepIntensity };
+                  applyBg();
+                  if (!persistBgOnly()) {
+                    toast("Gambar tampil, tapi terlalu besar untuk disimpan di HP — coba gambar yang lebih kecil agar tersimpan permanen.");
+                  } else {
+                    toast("Latar berhasil dipasang. Geser Intensitas untuk mengatur kejelasannya.");
+                  }
+                } catch (e) { toast("Gambar tidak bisa dipakai — coba gambar lain."); }
+              };
+              img.onerror = function () { toast("Gambar tidak bisa dibuka — coba gambar lain."); };
+              img.src = String(reader.result);
+            };
+            reader.onerror = function () { toast("Gambar tidak bisa dibaca — coba lagi."); };
+            reader.readAsDataURL(f);
+          });
+        }
+      })();
 
       /* ===== Cadangan: export & import data ===== */
       function download(name, content, type) {
@@ -985,7 +1319,7 @@
       }
       function backupJSON() {
         saveDay();
-        return JSON.stringify({ app: "stok-harian-kinmart-mandiri", exported: viewDate, wa: store.wa, days: store.days }, null, 2);
+        return JSON.stringify({ app: "stok-harian-kinmart-mandiri", exported: viewDate, wa: store.wa, bg: normBg(store.bg), days: store.days }, null, 2);
       }
       /* Bagikan file lewat menu bagikan HP (di sana ada pilihan "Simpan ke Drive").
          Kalau HP/browser tidak mendukung, file diunduh ke HP sebagai gantinya. */
@@ -1005,29 +1339,8 @@
         download(name, content, type);
         toast("Menu bagikan tidak tersedia di HP ini — file diunduh. Upload file itu lewat aplikasi Google Drive.");
       }
-      el("btn-export").addEventListener("click", function () {
-        download("backup-stok-kinmart-" + viewDate + ".json", backupJSON(), "application/json");
-        toast("Backup data terunduh.");
-      });
-      el("btn-export-hp").addEventListener("click", function () {
-        download("backup-stok-kinmart-" + viewDate + ".json", backupJSON(), "application/json");
-        toast("Backup data terunduh ke HP.");
-      });
       el("btn-export-drive").addEventListener("click", function () {
         shareOrDownload("backup-stok-kinmart-" + viewDate + ".json", backupJSON(), "application/json");
-      });
-      el("btn-export-txt").addEventListener("click", function () {
-        var c = counts();
-        var lines = ["Stok Harian Kinmart — " + fmtDate(viewDate), ""];
-        ["R", "K", "S"].forEach(function (st) {
-          lines.push(LABEL[st] + " (" + c[st] + "):");
-          NAMES.filter(function (n) { return state[n] === st; })
-            .sort(function (a, b) { return a.localeCompare(b, "id"); })
-            .forEach(function (n) { lines.push("- " + n); });
-          lines.push("");
-        });
-        download("stok-kinmart-" + viewDate + ".txt", lines.join("\n"), "text/plain");
-        toast("Laporan hari ini terunduh (TXT).");
       });
       el("import-file").addEventListener("change", function () {
         var f = this.files && this.files[0];
@@ -1037,11 +1350,19 @@
           try {
             var data = JSON.parse(String(reader.result));
             if (!data || typeof data !== "object" || !data.days) throw new Error("bad");
+            /* Hanya terima kunci tanggal berformat YYYY-MM-DD dari file backup. */
+            var cleanDays = {};
+            Object.keys(data.days).forEach(function (k) {
+              if (/^\d{4}-\d{2}-\d{2}$/.test(k)) cleanDays[k] = data.days[k];
+            });
+            data.days = cleanDays;
             pushUndo();
             store.days = data.days;
             if (typeof data.wa === "string") { store.wa = data.wa; el("wa-number").value = store.wa; }
+            if (data.bg) { store.bg = normBg(data.bg); }
             state = validStatuses(dayStatuses(store.days[viewDate]));
             persist();
+            applyBg();
             syncSavedLabel();
             refresh();
             toast("Data berhasil di-import.");
@@ -1056,12 +1377,19 @@
       /* ===== Refresh semua tampilan ===== */
       function refresh() {
         var c = counts();
+        var total = c.R + c.K || 1;
+        var pctR = Math.round(c.R / total * 100);
+        var pctK = 100 - pctR;
         el("c-ready").textContent = c.R;
         el("c-kosong").textContent = c.K;
-        el("c-restok").textContent = c.S;
         el("w-ready").textContent = c.R;
         el("w-kosong").textContent = c.K;
-        el("w-restok").textContent = c.S;
+        var br = el("bar-ready"), bk = el("bar-kosong");
+        if (br) br.style.width = pctR + "%";
+        if (bk) bk.style.width = pctK + "%";
+        var brl = el("bar-ready-label"), bkl = el("bar-kosong-label");
+        if (brl) brl.textContent = "Ready " + pctR + "%";
+        if (bkl) bkl.textContent = "Kosong " + pctK + "%";
         renderList();
         renderPicks();
         renderMessages();
@@ -1070,6 +1398,7 @@
 
       el("w-date").textContent = todayLabel();
       if (!storageOK) showStorageWarning();
+      applyBg();
       syncUndoBtn();
       loadDate(todayKey(), true);
     })();
