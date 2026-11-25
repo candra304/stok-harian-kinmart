@@ -69,13 +69,13 @@
         --glow-green: 0 10px 28px rgba(0, 255, 122, .32), 0 2px 8px rgba(0, 200, 83, .22);
         --glow-red: 0 10px 28px rgba(255, 36, 66, .30), 0 2px 8px rgba(255, 36, 66, .18);
         --radius: 18px;
-        /* Tema & tampilan — diatur dari tab Cadangan, disimpan di HP */
+        /* Tema & tampilan — diatur dari menu Pengaturan (gear), disimpan di HP */
         --ready-1: #00ff7a; --ready-2: #00c853; --ready-mid: #00e664;
         --kosong-1: #ff5c78; --kosong-2: #d6002b; --kosong-mid: #ff2442;
         --accent: #00e5ff;
         --font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
         --on-ready: #03130a; --on-kosong: #ffffff;
-        /* Ukuran baris daftar — diatur dari tab Cadangan / kontrol cepat di tab Daftar */
+        /* Ukuran baris daftar — diatur dari menu Pengaturan (gear) / kontrol cepat di tab Daftar */
         --list-gap: 10px;
         --item-pad-y: 12px; --item-pad-x: 12px; --item-gap: 12px;
         --tile-size: 48px; --tile-font: 1.55rem;
@@ -107,7 +107,7 @@
         }
       }
       * { box-sizing: border-box; }
-      html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 120px; }
+      html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: 150px; }
       body {
         margin: 0;
         background: var(--bg);
@@ -143,6 +143,18 @@
       .brand .date { color: var(--ink-soft); font-size: .74rem; margin-top: 1px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .brand .date strong { color: var(--ink); font-weight: 600; }
       .brand-counts { margin-left: auto; display: flex; gap: 6px; flex: none; }
+      .gear-btn {
+        flex: none; width: 42px; height: 42px; min-height: 42px; padding: 0;
+        border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface);
+        color: var(--ink); display: inline-flex; align-items: center; justify-content: center;
+        box-shadow: var(--shadow-sm);
+      }
+      .gear-btn svg { width: 22px; height: 22px; }
+      .gear-btn:active { background: var(--surface-2); }
+      @media (max-width: 380px) { .gear-btn { width: 38px; height: 38px; min-height: 38px; } .gear-btn svg { width: 20px; height: 20px; } }
+      /* Layar sempit: hitungan kecil di bar atas disembunyikan (angka yang sama ada di
+         kartu ringkasan) supaya judul + tanggal tidak terpotong oleh tombol gear. */
+      @media (max-width: 480px) { .brand-counts { display: none; } .gear-btn { margin-left: auto; } }
       .bc { font-size: .7rem; font-weight: 700; padding: 5px 9px; border-radius: 999px; background: var(--surface-2); color: var(--ink-soft); white-space: nowrap; }
       .bc b { font-size: .84rem; font-weight: 800; }
       .bc-r b { color: var(--green-dark); }
@@ -263,6 +275,7 @@
         font-weight: 600; font-size: .68rem; color: #8fa698;
       }
       .tab svg { width: 23px; height: 23px; flex: none; }
+      @media (max-width: 430px) { .tab { font-size: .6rem; padding: 5px 1px; } .tab svg { width: 21px; height: 21px; } }
       .tab.active { color: var(--green-neon); background: rgba(0, 255, 122, .13); box-shadow: inset 0 0 0 1px rgba(0,255,122,.35), 0 0 16px rgba(0,255,122,.12); }
       @media (prefers-color-scheme: dark) { .tab.active { color: var(--green-neon); background: rgba(0, 255, 122, .13); } }
       .panel { display: none; margin-top: 12px; }
@@ -317,7 +330,7 @@
         border-radius: var(--radius);
         padding: var(--item-pad-y) var(--item-pad-x);
         display: flex; flex-direction: row; align-items: center; gap: var(--item-gap);
-        scroll-margin-bottom: 20px;
+        scroll-margin-bottom: 132px;
       }
       .item.R {
         background: linear-gradient(118deg, var(--ready-1) 0%, var(--ready-mid) 42%, var(--ready-2) 100%);
@@ -355,7 +368,7 @@
       .seg button {
         border-radius: 999px; font-weight: 800; font-size: var(--seg-font); letter-spacing: .03em; text-transform: uppercase;
         padding: var(--seg-pad-y) var(--seg-pad-x); min-height: var(--seg-min-h);
-        white-space: nowrap; scroll-margin-bottom: 20px;
+        white-space: nowrap; scroll-margin-bottom: 132px;
       }
       .item.R .seg button { border: 1.5px solid rgba(3,19,10,.35); background: rgba(255,255,255,.22); color: rgba(3,19,10,.82); }
       .item.K .seg button { border: 1.5px solid rgba(255,255,255,.55); background: rgba(255,255,255,.16); color: rgba(255,255,255,.94); }
@@ -588,6 +601,7 @@
               <div class="date" id="today-label">—</div>
             </div>
             <div class="brand-counts" aria-hidden="true"><span class="bc bc-r"><b id="c-ready-mini">0</b> Ready</span><span class="bc bc-k"><b id="c-kosong-mini">0</b> Kosong</span></div>
+            <button class="gear-btn" id="btn-gear-top" type="button" aria-label="Buka Pengaturan" title="Pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
           </div>
         </div>
 
@@ -700,11 +714,15 @@
           </div>
         </section>
 
-        <!-- ===== Cadangan ===== -->
-        <section class="panel" id="panel-cadangan">
+        <!-- ===== Pengaturan (menu khusus gear) ===== -->
+        <section class="panel" id="panel-pengaturan">
+          <div class="card">
+            <h2>Pengaturan</h2>
+            <p class="hint">Semua pengaturan tampilan ada di menu ini: tema, warna, warna font, ukuran font, jenis font, ukuran baris daftar, dan latar belakang. Tab Cadangan khusus untuk Export &amp; Import backup saja.</p>
+          </div>
           <div class="card" id="card-tampilan">
             <h2>Tema &amp; Tampilan</h2>
-            <p class="hint">Pilih salah satu dari 5 tema utama berwarna cerah, atau atur sendiri warna, intensitas warna, warna font, dan jenis font-nya. Semua perubahan langsung terlihat dan tersimpan otomatis di HP ini.</p>
+            <p class="hint">Pilih salah satu dari 5 tema utama berwarna cerah, atau atur sendiri warna, intensitas warna, warna font, ukuran font, dan jenis font-nya. Semua perubahan langsung terlihat dan tersimpan otomatis di HP ini.</p>
 
             <div class="appearance-block" style="margin-top:6px">
               <h3>5 Tema Utama</h3>
@@ -751,8 +769,29 @@
             </div>
 
             <div class="appearance-block">
-              <h3>Warna Sendiri</h3>
-              <p class="hint">Ketuk kotak warna untuk memilih warna sendiri — ini menimpa warna tema untuk bagian itu. Tekan “Tema” untuk kembali ke warna tema.</p>
+              <h3>Ukuran Font</h3>
+              <p class="hint">Geser untuk memperbesar atau memperkecil semua tulisan di aplikasi — judul, nama barang, tombol, dan menu ikut berubah.</p>
+              <div class="bg-intensity-head">
+                <label for="font-size">Ukuran Font Keseluruhan</label>
+                <span class="bg-intensity-val" id="font-size-val">100%</span>
+              </div>
+              <div class="bg-range-wrap">
+                <span>Kecil</span>
+                <input type="range" class="bg-range" id="font-size" min="80" max="130" step="1" value="100" aria-label="Ukuran font keseluruhan, 80 sampai 130 persen" />
+                <span>Besar</span>
+              </div>
+              <div class="font-opts" role="group" aria-label="Pilihan cepat ukuran font" style="margin-top:10px">
+                <button class="fchip" type="button" data-font-size-preset="90">Kecil 90%</button>
+                <button class="fchip" type="button" data-font-size-preset="100">Normal 100%</button>
+                <button class="fchip" type="button" data-font-size-preset="115">Besar 115%</button>
+                <button class="fchip" type="button" data-font-size-preset="130">Jumbo 130%</button>
+              </div>
+              <p class="hint" style="margin:10px 0 0">Contoh: <span id="font-size-preview" style="font-weight:700;color:var(--ink)">Wortel — Ready / Kosong</span></p>
+            </div>
+
+            <div class="appearance-block">
+              <h3>Warna Sendiri — termasuk Warna Font</h3>
+              <p class="hint">Ketuk kotak warna untuk memilih warna sendiri — termasuk <b>Warna Font</b> untuk warna tulisan utama. Ini menimpa warna tema untuk bagian itu. Tekan “Tema” untuk kembali ke warna tema.</p>
               <div class="color-rows">
                 <div class="color-row">
                   <input type="color" id="color-ready" value="#00e664" aria-label="Warna Ready sendiri" />
@@ -805,7 +844,7 @@
 
             <div class="appearance-block">
               <button class="btn" id="btn-appearance-reset" type="button" style="width:100%;min-height:48px">Reset Tampilan ke Awal</button>
-              <p class="hint" style="margin:8px 0 0">Reset mengembalikan tema Neon Elite, font Poppins, dan semua warna ke bawaan tema.</p>
+              <p class="hint" style="margin:8px 0 0">Reset mengembalikan tema Neon Elite, font Poppins, ukuran font 100%, dan semua warna ke bawaan tema.</p>
             </div>
           </div>
           <div class="card" id="card-ukuran-daftar">
@@ -919,6 +958,14 @@
               </div>
             </div>
           </div>
+        </section>
+
+        <!-- ===== Cadangan (khusus backup saja) ===== -->
+        <section class="panel" id="panel-cadangan">
+          <div class="card">
+            <h2>Cadangan — Export &amp; Import</h2>
+            <p class="hint">Tab ini khusus cadangan data saja: Export untuk menyimpan backup dan Import untuk mengembalikan backup. Pengaturan tampilan, warna, dan font ada di menu Pengaturan (ikon gear).</p>
+          </div>
           <div class="card">
             <h2>Export ke Drive</h2>
             <p class="hint">Simpan backup data stok semua tanggal ke Google Drive. Menu bagikan HP terbuka — pilih <b>Drive → Simpan ke Drive</b>. Kalau menu bagikan tidak muncul di HP kamu, file backup otomatis terunduh ke HP dan bisa di-upload lewat aplikasi Drive.</p>
@@ -945,6 +992,7 @@
           <button class="tab" type="button" data-tab="kirim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 21l2-5.6A8.5 8.5 0 1 1 21 11.5z"/></svg>Kirim WA</button>
           <button class="tab" type="button" data-tab="histori"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 8.5A8.5 8.5 0 1 1 3.6 13"/><path d="M4 4v4.5h4.5"/><path d="M12 8v4.2l3 1.8"/></svg>Histori</button>
           <button class="tab" type="button" data-tab="cadangan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5h16l-1.4 11a2 2 0 0 1-2 1.7H7.4a2 2 0 0 1-2-1.7L4 8.5z"/><path d="M3 4h18v4.5H3z"/><path d="M10 13h4"/></svg>Cadangan</button>
+          <button class="tab" type="button" data-tab="pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Pengaturan</button>
         </nav>
     </div>
 
@@ -1039,7 +1087,7 @@
       };
       var FONTS = ["poppins", "nunito", "jakarta", "montserrat", "quicksand"];
       function defaultAppearance() {
-        return { theme: "neon", font: "poppins", ready: "", kosong: "", accent: "", fontColor: "", colorIntensity: 85, fontIntensity: 100 };
+        return { theme: "neon", font: "poppins", fontSize: 100, ready: "", kosong: "", accent: "", fontColor: "", colorIntensity: 85, fontIntensity: 100 };
       }
       function normAppearance(raw) {
         var d = defaultAppearance();
@@ -1047,6 +1095,7 @@
         var out = {
           theme: THEMES[raw.theme] ? raw.theme : d.theme,
           font: FONTS.indexOf(raw.font) >= 0 ? raw.font : d.font,
+          fontSize: (typeof raw.fontSize === "number" && isFinite(raw.fontSize)) ? Math.max(80, Math.min(130, Math.round(raw.fontSize))) : d.fontSize,
           ready: /^#[0-9a-fA-F]{6}$/.test(raw.ready || "") ? raw.ready : "",
           kosong: /^#[0-9a-fA-F]{6}$/.test(raw.kosong || "") ? raw.kosong : "",
           accent: /^#[0-9a-fA-F]{6}$/.test(raw.accent || "") ? raw.accent : "",
@@ -1161,6 +1210,8 @@
         } else {
           st.removeProperty("--ink");
         }
+        /* Ukuran font keseluruhan: skala ukuran dasar (rem) seluruh aplikasi. */
+        st.fontSize = (16 * ap.fontSize / 100) + "px";
         /* Sinkronkan kontrol di kartu Tema & Tampilan */
         document.querySelectorAll("[data-theme-choice]").forEach(function (b) {
           b.classList.toggle("active", b.getAttribute("data-theme-choice") === ap.theme);
@@ -1183,6 +1234,14 @@
         var fs = document.getElementById("font-intensity"), fv = document.getElementById("font-intensity-val");
         if (fs) { fs.value = String(ap.fontIntensity); fs.style.setProperty("--fill", ap.fontIntensity + "%"); }
         if (fv) fv.textContent = ap.fontIntensity + "%";
+        var fz = document.getElementById("font-size"), fzv = document.getElementById("font-size-val");
+        if (fz) { fz.value = String(ap.fontSize); fz.style.setProperty("--fill", ((ap.fontSize - 80) / 50 * 100) + "%"); }
+        if (fzv) fzv.textContent = ap.fontSize + "%";
+        document.querySelectorAll("[data-font-size-preset]").forEach(function (b) {
+          b.classList.toggle("active", Number(b.getAttribute("data-font-size-preset")) === ap.fontSize);
+        });
+        var fzp = document.getElementById("font-size-preview");
+        if (fzp) fzp.style.fontSize = (ap.fontSize / 100) + "em";
       }
       function setAppearance(patch, save) {
         store.appearance = normAppearance(Object.assign({}, store.appearance, patch));
@@ -1766,6 +1825,19 @@
           cs.addEventListener("input", function () { setAppearance({ colorIntensity: Number(cs.value) }, false); });
           cs.addEventListener("change", function () { setAppearance({ colorIntensity: Number(cs.value) }, true); toast("Intensitas warna diatur ke " + store.appearance.colorIntensity + "%."); });
         }
+        var fz = el("font-size");
+        if (fz) {
+          fz.addEventListener("input", function () { setAppearance({ fontSize: Number(fz.value) }, false); });
+          fz.addEventListener("change", function () { setAppearance({ fontSize: Number(fz.value) }, true); toast("Ukuran font diatur ke " + store.appearance.fontSize + "%."); });
+        }
+        document.querySelectorAll("[data-font-size-preset]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            setAppearance({ fontSize: Number(b.getAttribute("data-font-size-preset")) }, true);
+            toast("Ukuran font diatur ke " + store.appearance.fontSize + "%.");
+          });
+        });
+        var gearTop = el("btn-gear-top");
+        if (gearTop) gearTop.addEventListener("click", function () { activateTab("pengaturan"); window.scrollTo({ top: 0 }); });
         var fs = el("font-intensity");
         if (fs) {
           fs.addEventListener("input", function () { setAppearance({ fontIntensity: Number(fs.value) }, false); });
@@ -1796,7 +1868,7 @@
         }
       })();
 
-      /* ===== Ukuran baris daftar: kontrol cepat + slider di Cadangan ===== */
+      /* ===== Ukuran baris daftar: kontrol cepat + slider di Pengaturan ===== */
       (function initListSizeControls() {
         document.querySelectorAll("[data-list-preset]").forEach(function (b) {
           b.addEventListener("click", function () {
