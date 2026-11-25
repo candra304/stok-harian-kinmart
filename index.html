@@ -75,6 +75,12 @@
         --accent: #00e5ff;
         --font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
         --on-ready: #03130a; --on-kosong: #ffffff;
+        /* Ukuran baris daftar — diatur dari tab Cadangan / kontrol cepat di tab Daftar */
+        --list-gap: 10px;
+        --item-pad-y: 12px; --item-pad-x: 12px; --item-gap: 12px;
+        --tile-size: 48px; --tile-font: 1.55rem;
+        --item-name-size: .98rem;
+        --seg-font: .8rem; --seg-pad-y: 9px; --seg-pad-x: 12px; --seg-min-h: 42px;
       }
       /* 5 TEMA UTAMA — warna-warna cerah */
       html[data-theme="tropis"] { --ready-1:#a6ff00; --ready-mid:#00e676; --ready-2:#00b248; --kosong-1:#ffb300; --kosong-mid:#ff6d00; --kosong-2:#e65100; --accent:#ffea00; --green-neon:#00e676; --cyan:#ffea00; }
@@ -283,14 +289,34 @@
       .fchip.active { background: var(--obsidian); color: #fff; border-color: var(--obsidian); box-shadow: 0 8px 20px rgba(5,8,7,.28); }
       .fchip[data-filter="R"].active { background: linear-gradient(120deg, var(--ready-1), var(--ready-2)); color: var(--on-ready); border-color: transparent; box-shadow: var(--glow-green); }
       .fchip[data-filter="K"].active { background: linear-gradient(120deg, var(--kosong-1), var(--kosong-mid) 55%, var(--kosong-2)); color: var(--on-kosong); border-color: transparent; box-shadow: var(--glow-red); }
-      #list { display: flex; flex-direction: column; gap: 10px; }
+      #list { display: flex; flex-direction: column; gap: var(--list-gap); }
+      /* Kontrol cepat ukuran baris — langsung di atas daftar */
+      .list-size-bar {
+        display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        margin: 0 0 10px; padding: 9px 10px;
+        background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+        box-shadow: var(--shadow-sm);
+      }
+      .list-size-bar .ls-label { font-size: .82rem; font-weight: 800; letter-spacing: .02em; white-space: nowrap; }
+      .list-size-bar .ls-label small { display: block; font-size: .7rem; font-weight: 600; color: var(--ink-soft); letter-spacing: 0; }
+      .size-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+      .size-chip {
+        border: 1.5px solid var(--line); background: var(--surface-2); color: var(--ink);
+        border-radius: 999px; padding: 7px 12px; font-weight: 800; font-size: .78rem; min-height: 36px; white-space: nowrap;
+      }
+      .size-chip.active { background: var(--obsidian); color: var(--green-neon); border-color: var(--obsidian); box-shadow: 0 6px 16px rgba(5,8,7,.25); }
+      /* Pratinjau ukuran di kartu pengaturan */
+      .size-preview { border: 1px dashed var(--line); border-radius: 16px; padding: 12px; background: var(--surface-2); }
+      .size-preview .item { pointer-events: none; }
+      .size-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      @media (max-width: 420px) { .size-grid { grid-template-columns: 1fr 1fr; } .size-chip { padding: 7px 10px; font-size: .74rem; } }
       /* Baris barang NEON ELITE full color — 1 item per baris, tanpa simbol.
          Ready: volt green neon + teks hitam pekat (kontras paling tegas).
          Kosong: coral neon + teks putih jernih. Glow tipis & terkontrol = elit, bukan norak. */
       .item {
         border-radius: var(--radius);
-        padding: 12px;
-        display: flex; flex-direction: row; align-items: center; gap: 12px;
+        padding: var(--item-pad-y) var(--item-pad-x);
+        display: flex; flex-direction: row; align-items: center; gap: var(--item-gap);
         scroll-margin-bottom: 20px;
       }
       .item.R {
@@ -306,12 +332,12 @@
         box-shadow: var(--glow-red), inset 0 1px 0 rgba(255,255,255,.32);
       }
       .tile {
-        position: relative; border-radius: 12px; width: 48px; height: 48px; flex: none;
+        position: relative; border-radius: 12px; width: var(--tile-size); height: var(--tile-size); flex: none;
         display: flex; align-items: center; justify-content: center;
       }
       .item.R .tile { background: rgba(3, 19, 10, .16); box-shadow: inset 0 0 0 1px rgba(3,19,10,.18); }
       .item.K .tile { background: rgba(255,255,255,.20); box-shadow: inset 0 0 0 1px rgba(255,255,255,.32); }
-      .tile .mono { font-size: 1.55rem; font-weight: 800; line-height: 1; }
+      .tile .mono { font-size: var(--tile-font); font-weight: 800; line-height: 1; }
       .item.R .tile .mono { color: var(--on-ready); }
       .item.K .tile .mono { color: var(--on-kosong); }
       .item-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
@@ -322,23 +348,27 @@
       }
       .pill.R { background: #03130a; color: var(--green-neon); }
       .pill.K { background: #fff; color: var(--kosong-2); }
-      .item-name { font-weight: 700; font-size: .98rem; line-height: 1.3; word-break: break-word; }
+      .item-name { font-weight: 700; font-size: var(--item-name-size); line-height: 1.3; word-break: break-word; }
       .item.R .item-name { color: var(--on-ready); }
       .item.K .item-name { color: var(--on-kosong); }
       .seg { display: flex; gap: 6px; flex: none; margin: 0; padding: 0; }
       .seg button {
-        border-radius: 999px; font-weight: 800; font-size: .8rem; letter-spacing: .03em; text-transform: uppercase;
-        padding: 9px 12px; min-height: 42px;
+        border-radius: 999px; font-weight: 800; font-size: var(--seg-font); letter-spacing: .03em; text-transform: uppercase;
+        padding: var(--seg-pad-y) var(--seg-pad-x); min-height: var(--seg-min-h);
         white-space: nowrap; scroll-margin-bottom: 20px;
       }
       .item.R .seg button { border: 1.5px solid rgba(3,19,10,.35); background: rgba(255,255,255,.22); color: rgba(3,19,10,.82); }
       .item.K .seg button { border: 1.5px solid rgba(255,255,255,.55); background: rgba(255,255,255,.16); color: rgba(255,255,255,.94); }
       @media (max-width: 480px) {
-        .item { gap: 10px; padding: 10px; }
-        .tile { width: 44px; height: 44px; border-radius: 11px; }
-        .tile .mono { font-size: 1.4rem; }
-        .item-name { font-size: .92rem; }
-        .seg button { padding: 8px 9px; font-size: .72rem; min-height: 40px; }
+        .item { gap: calc(var(--item-gap) * .85); padding: calc(var(--item-pad-y) * .85) calc(var(--item-pad-x) * .85); }
+        .tile { width: calc(var(--tile-size) * .92); height: calc(var(--tile-size) * .92); border-radius: 11px; }
+        .tile .mono { font-size: calc(var(--tile-font) * .9); }
+        .item-name { font-size: calc(var(--item-name-size) * .94); }
+        .seg button { padding: calc(var(--seg-pad-y) * .9) calc(var(--seg-pad-x) * .75); font-size: calc(var(--seg-font) * .9); min-height: calc(var(--seg-min-h) * .95); }
+      }
+      @media (max-width: 360px) {
+        .seg { flex-direction: column; gap: 5px; }
+        .seg button { width: 100%; }
       }
       .seg button.on-R { background: #03130a !important; color: var(--ready-1) !important; border-color: #03130a !important; box-shadow: 0 6px 16px rgba(3,19,10,.30); }
       .seg button.on-K { background: #ffffff !important; color: var(--kosong-2) !important; border-color: #ffffff !important; box-shadow: 0 6px 16px rgba(0,0,0,.20); }
@@ -602,6 +632,15 @@
             <button class="fchip" type="button" data-filter="R">Ready</button>
             <button class="fchip" type="button" data-filter="K">Kosong</button>
           </div>
+          <div class="list-size-bar" aria-label="Pengaturan ukuran baris daftar">
+            <span class="ls-label">Ukuran Baris<small>Atur besar-kecilnya daftar</small></span>
+            <div class="size-chips" role="group" aria-label="Pilih ukuran baris daftar">
+              <button class="size-chip" type="button" data-list-preset="compact">Ringkas</button>
+              <button class="size-chip" type="button" data-list-preset="normal">Normal</button>
+              <button class="size-chip" type="button" data-list-preset="large">Besar</button>
+              <button class="size-chip" type="button" data-list-preset="jumbo">Jumbo</button>
+            </div>
+          </div>
           <div id="list"></div>
           <div class="empty-note" id="list-empty" hidden>Tidak ada barang yang cocok dengan pencarian / filter ini.</div>
         </section>
@@ -767,6 +806,83 @@
             <div class="appearance-block">
               <button class="btn" id="btn-appearance-reset" type="button" style="width:100%;min-height:48px">Reset Tampilan ke Awal</button>
               <p class="hint" style="margin:8px 0 0">Reset mengembalikan tema Neon Elite, font Poppins, dan semua warna ke bawaan tema.</p>
+            </div>
+          </div>
+          <div class="card" id="card-ukuran-daftar">
+            <h2>Ukuran Baris Daftar</h2>
+            <p class="hint">Atur ukuran kolom / baris daftar barang sesuai kenyamanan mata dan jari — mau rapat supaya banyak barang terlihat sekaligus, atau besar supaya tombol Ready / Kosong gampang ditekan. Perubahan langsung terlihat, tersimpan otomatis di HP ini, dan ikut ter-export di backup.</p>
+
+            <div class="appearance-block" style="margin-top:6px">
+              <h3>Pilihan Cepat</h3>
+              <p class="hint">Ketuk satu ukuran untuk langsung menerapkannya ke seluruh daftar.</p>
+              <div class="size-grid" role="group" aria-label="Pilihan cepat ukuran baris daftar">
+                <button class="size-chip" type="button" data-list-preset="compact" style="min-height:44px">Ringkas — rapat</button>
+                <button class="size-chip" type="button" data-list-preset="normal" style="min-height:44px">Normal — bawaan</button>
+                <button class="size-chip" type="button" data-list-preset="large" style="min-height:44px">Besar — lega</button>
+                <button class="size-chip" type="button" data-list-preset="jumbo" style="min-height:44px">Jumbo — paling besar</button>
+              </div>
+            </div>
+
+            <div class="appearance-block">
+              <h3>Pratinjau Langsung</h3>
+              <p class="hint">Contoh baris di bawah ikut berubah saat kamu menggeser slider.</p>
+              <div class="size-preview" aria-hidden="true">
+                <div class="item R"><div class="tile"><span class="mono">W</span></div><div class="item-main"><div class="item-name">Wortel</div><span class="pill R">Ready</span></div><div class="seg"><button type="button" class="on-R" tabindex="-1">Ready</button><button type="button" tabindex="-1">Kosong</button></div></div>
+              </div>
+            </div>
+
+            <div class="appearance-block">
+              <div class="bg-intensity-head">
+                <label for="list-density">Tinggi Baris</label>
+                <span class="bg-intensity-val" id="list-density-val">100%</span>
+              </div>
+              <div class="bg-range-wrap">
+                <span>Rapat</span>
+                <input type="range" class="bg-range" id="list-density" min="60" max="140" step="1" value="100" aria-label="Tinggi baris daftar, 60 sampai 140 persen" />
+                <span>Tinggi</span>
+              </div>
+              <p class="hint" style="margin:8px 0 0">Mengatur tebal baris dan besar ubin huruf di setiap baris barang.</p>
+            </div>
+
+            <div class="appearance-block">
+              <div class="bg-intensity-head">
+                <label for="list-font-size">Ukuran Nama Barang</label>
+                <span class="bg-intensity-val" id="list-font-size-val">100%</span>
+              </div>
+              <div class="bg-range-wrap">
+                <span>Kecil</span>
+                <input type="range" class="bg-range" id="list-font-size" min="80" max="130" step="1" value="100" aria-label="Ukuran tulisan nama barang, 80 sampai 130 persen" />
+                <span>Besar</span>
+              </div>
+            </div>
+
+            <div class="appearance-block">
+              <div class="bg-intensity-head">
+                <label for="list-button-size">Ukuran Tombol Ready / Kosong</label>
+                <span class="bg-intensity-val" id="list-button-size-val">100%</span>
+              </div>
+              <div class="bg-range-wrap">
+                <span>Kecil</span>
+                <input type="range" class="bg-range" id="list-button-size" min="80" max="130" step="1" value="100" aria-label="Ukuran tombol Ready dan Kosong, 80 sampai 130 persen" />
+                <span>Besar</span>
+              </div>
+            </div>
+
+            <div class="appearance-block">
+              <div class="bg-intensity-head">
+                <label for="list-gap-size">Jarak Antar Baris</label>
+                <span class="bg-intensity-val" id="list-gap-size-val">10px</span>
+              </div>
+              <div class="bg-range-wrap">
+                <span>Rapat</span>
+                <input type="range" class="bg-range" id="list-gap-size" min="4" max="24" step="1" value="10" aria-label="Jarak antar baris daftar, 4 sampai 24 piksel" />
+                <span>Renggang</span>
+              </div>
+            </div>
+
+            <div class="appearance-block">
+              <button class="btn" id="btn-list-size-reset" type="button" style="width:100%;min-height:48px">Reset Ukuran ke Normal</button>
+              <p class="hint" style="margin:8px 0 0">Reset mengembalikan ukuran baris ke Normal (tinggi 100%, nama 100%, tombol 100%, jarak 10px). Pengaturan ini juga bisa diubah cepat dari chip Ringkas / Normal / Besar / Jumbo di tab Daftar.</p>
             </div>
           </div>
           <div class="card" id="card-latar">
@@ -975,7 +1091,13 @@
         return "#" + cc(ch(a, 1) + (ch(b, 1) - ch(a, 1)) * t) + cc(ch(a, 3) + (ch(b, 3) - ch(a, 3)) * t) + cc(ch(a, 5) + (ch(b, 5) - ch(a, 5)) * t);
       }
 
-      var store = { days: {}, wa: "", bg: { img: "", intensity: DEFAULT_BG_INTENSITY }, appearance: defaultAppearance() };
+      var LIST_PRESETS = {
+        compact: { density: 72, fontSize: 88, buttonSize: 85, gap: 6 },
+        normal:  { density: 100, fontSize: 100, buttonSize: 100, gap: 10 },
+        large:   { density: 122, fontSize: 112, buttonSize: 112, gap: 14 },
+        jumbo:   { density: 140, fontSize: 128, buttonSize: 125, gap: 18 }
+      };
+      var store = { days: {}, wa: "", bg: { img: "", intensity: DEFAULT_BG_INTENSITY }, appearance: defaultAppearance(), listSize: defaultListSize() };
       var storageOK = true;
       try {
         var saved = localStorage.getItem(STORE_KEY);
@@ -986,6 +1108,7 @@
             store.wa = parsed.wa || "";
             store.bg = normBg(parsed.bg);
             store.appearance = normAppearance(parsed.appearance);
+            store.listSize = normListSize(parsed.listSize);
           }
         }
       } catch (e) { storageOK = false; }
@@ -1065,6 +1188,80 @@
         store.appearance = normAppearance(Object.assign({}, store.appearance, patch));
         applyAppearance();
         if (save) persistAppearance();
+      }
+
+      /* ===== Ukuran baris daftar: preset + slider tinggi / font / tombol / jarak ===== */
+      function defaultListSize() { return { preset: "normal", density: 100, fontSize: 100, buttonSize: 100, gap: 10 }; }
+      function clampNum(v, min, max, fallback) {
+        var n = (typeof v === "number" && isFinite(v)) ? Math.round(v) : fallback;
+        return Math.max(min, Math.min(max, n));
+      }
+      function normListSize(raw) {
+        var d = defaultListSize();
+        if (!raw || typeof raw !== "object") return d;
+        var out = {
+          preset: LIST_PRESETS[raw.preset] ? raw.preset : (raw.preset === "custom" ? "custom" : d.preset),
+          density: clampNum(raw.density, 60, 140, d.density),
+          fontSize: clampNum(raw.fontSize, 80, 130, d.fontSize),
+          buttonSize: clampNum(raw.buttonSize, 80, 130, d.buttonSize),
+          gap: clampNum(raw.gap, 4, 24, d.gap)
+        };
+        /* Kalau angka persis sama dengan sebuah preset, tandai preset itu aktif. */
+        if (out.preset !== "custom") {
+          Object.keys(LIST_PRESETS).forEach(function (k) {
+            var p = LIST_PRESETS[k];
+            if (p.density === out.density && p.fontSize === out.fontSize && p.buttonSize === out.buttonSize && p.gap === out.gap) out.preset = k;
+          });
+        }
+        return out;
+      }
+      function persistListSize() {
+        try {
+          var raw = JSON.stringify(store);
+          localStorage.setItem(STORE_KEY, raw);
+          return localStorage.getItem(STORE_KEY) === raw;
+        } catch (e) { return false; }
+      }
+      function applyListSize() {
+        var ls = normListSize(store.listSize);
+        store.listSize = ls;
+        var st = document.documentElement.style;
+        var d = ls.density / 100, f = ls.fontSize / 100, b = ls.buttonSize / 100;
+        st.setProperty("--list-gap", ls.gap + "px");
+        st.setProperty("--item-pad-y", Math.round(12 * d) + "px");
+        st.setProperty("--item-pad-x", Math.round(12 * d) + "px");
+        st.setProperty("--item-gap", Math.round(12 * d) + "px");
+        st.setProperty("--tile-size", Math.round(48 * d) + "px");
+        st.setProperty("--tile-font", (1.55 * d).toFixed(2) + "rem");
+        st.setProperty("--item-name-size", (0.98 * f).toFixed(3) + "rem");
+        st.setProperty("--seg-font", (0.8 * b).toFixed(3) + "rem");
+        st.setProperty("--seg-pad-y", Math.round(9 * b) + "px");
+        st.setProperty("--seg-pad-x", Math.round(12 * b) + "px");
+        st.setProperty("--seg-min-h", Math.round(42 * b) + "px");
+        document.querySelectorAll("[data-list-preset]").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-list-preset") === ls.preset);
+        });
+        function syncSlider(id, valId, value, suffix, fillPct) {
+          var s = document.getElementById(id), v = document.getElementById(valId);
+          if (s) { s.value = String(value); s.style.setProperty("--fill", fillPct + "%"); }
+          if (v) v.textContent = value + suffix;
+        }
+        syncSlider("list-density", "list-density-val", ls.density, "%", (ls.density - 60) / 80 * 100);
+        syncSlider("list-font-size", "list-font-size-val", ls.fontSize, "%", (ls.fontSize - 80) / 50 * 100);
+        syncSlider("list-button-size", "list-button-size-val", ls.buttonSize, "%", (ls.buttonSize - 80) / 50 * 100);
+        syncSlider("list-gap-size", "list-gap-size-val", ls.gap, "px", (ls.gap - 4) / 20 * 100);
+      }
+      function setListSize(patch, save) {
+        store.listSize = normListSize(Object.assign({}, store.listSize, patch));
+        applyListSize();
+        if (save) persistListSize();
+      }
+      function setListPreset(name, save) {
+        var p = LIST_PRESETS[name];
+        if (!p) return;
+        store.listSize = normListSize({ preset: name, density: p.density, fontSize: p.fontSize, buttonSize: p.buttonSize, gap: p.gap });
+        applyListSize();
+        if (save) persistListSize();
       }
 
       function persistBgOnly() {
@@ -1599,6 +1796,45 @@
         }
       })();
 
+      /* ===== Ukuran baris daftar: kontrol cepat + slider di Cadangan ===== */
+      (function initListSizeControls() {
+        document.querySelectorAll("[data-list-preset]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var name = b.getAttribute("data-list-preset");
+            setListPreset(name, true);
+            var labels = { compact: "Ringkas", normal: "Normal", large: "Besar", jumbo: "Jumbo" };
+            toast("Ukuran baris daftar: " + (labels[name] || name) + ".");
+          });
+        });
+        function bindSlider(id, key) {
+          var s = el(id);
+          if (!s) return;
+          s.addEventListener("input", function () { var p = { preset: "custom" }; p[key] = Number(s.value); setListSize(p, false); });
+          s.addEventListener("change", function () { var p = { preset: "custom" }; p[key] = Number(s.value); setListSize(p, true); toast("Ukuran daftar disimpan."); });
+        }
+        bindSlider("list-density", "density");
+        bindSlider("list-font-size", "fontSize");
+        bindSlider("list-button-size", "buttonSize");
+        bindSlider("list-gap-size", "gap");
+        var resetBtn = el("btn-list-size-reset");
+        if (resetBtn) {
+          var armed = false, timer = null;
+          resetBtn.addEventListener("click", function () {
+            if (!armed) {
+              armed = true;
+              resetBtn.textContent = "Yakin Reset? Tekan Sekali Lagi";
+              resetBtn.classList.add("armed");
+              timer = setTimeout(function () { armed = false; resetBtn.textContent = "Reset Ukuran ke Normal"; resetBtn.classList.remove("armed"); }, 3200);
+              return;
+            }
+            clearTimeout(timer); armed = false;
+            resetBtn.textContent = "Reset Ukuran ke Normal"; resetBtn.classList.remove("armed");
+            setListPreset("normal", true);
+            toast("Ukuran baris daftar kembali ke Normal.");
+          });
+        }
+      })();
+
       /* ===== Latar: slider, preset, pilih & hapus gambar ===== */
       (function initBgControls() {
         var slider = el("bg-intensity");
@@ -1703,7 +1939,7 @@
       }
       function backupJSON() {
         saveDay();
-        return JSON.stringify({ app: "stok-harian-kinmart-mandiri", exported: viewDate, wa: store.wa, bg: normBg(store.bg), appearance: normAppearance(store.appearance), days: store.days }, null, 2);
+        return JSON.stringify({ app: "stok-harian-kinmart-mandiri", exported: viewDate, wa: store.wa, bg: normBg(store.bg), appearance: normAppearance(store.appearance), listSize: normListSize(store.listSize), days: store.days }, null, 2);
       }
       /* Bagikan file lewat menu bagikan HP (di sana ada pilihan "Simpan ke Drive").
          Kalau HP/browser tidak mendukung, file diunduh ke HP sebagai gantinya. */
@@ -1745,10 +1981,12 @@
             if (typeof data.wa === "string") { store.wa = data.wa; el("wa-number").value = store.wa; }
             if (data.bg) { store.bg = normBg(data.bg); }
             if (data.appearance) { store.appearance = normAppearance(data.appearance); }
+            if (data.listSize) { store.listSize = normListSize(data.listSize); }
             state = validStatuses(dayStatuses(store.days[viewDate]));
             persist();
             applyBg();
             applyAppearance();
+            applyListSize();
             syncSavedLabel();
             refresh();
             toast("Data berhasil di-import.");
@@ -1788,6 +2026,7 @@
       el("w-date").textContent = todayLabel();
       if (!storageOK) showStorageWarning();
       applyAppearance();
+      applyListSize();
       applyBg();
       syncUndoBtn();
       loadDate(todayKey(), true);
